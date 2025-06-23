@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_file, render_template
+from flask import Flask, jsonify, request, send_file, render_template, session
 import requests
 import os
 import json
@@ -9,10 +9,36 @@ from PIL import Image
 from io import BytesIO
 import re
 from urllib.parse import urljoin
+from functools import wraps
 
 app = Flask(__name__)
+# Use environment variables for secrets; set these in your environment for production!
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'changeme-please')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'changeme123')
 DATA_FILE = 'data.json'
 RSS_SOURCE = 'zoom_blog_feed_v3.xml'  # Or a URL if you want live fetching
+
+# --- Admin session decorator ---
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin'):
+            return jsonify({'error': 'Unauthorized'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/admin_login', methods=['POST'])
+def admin_login():
+    data = request.get_json()
+    if data.get('password') == ADMIN_PASSWORD:
+        session['admin'] = True
+        return jsonify({'success': True})
+    return jsonify({'success': False}), 401
+
+@app.route('/admin_logout', methods=['POST'])
+def admin_logout():
+    session.pop('admin', None)
+    return jsonify({'success': True})
 
 def parse_rss():
     # Load RSS from file or URL
@@ -146,6 +172,7 @@ def manual_scrape():
     return jsonify({'status': 'scraped', 'added': added})
 
 @app.route('/api/posts', methods=['GET'])
+@admin_required
 def get_posts():
     return jsonify(load_data())
 
@@ -154,6 +181,7 @@ def home():
     return render_template('index.html')
 
 @app.route('/api/posts/<path:post_id>', methods=['POST'])
+@admin_required
 def update_post(post_id):
     data = load_data()
     for post in data:
@@ -168,6 +196,7 @@ def update_post(post_id):
     return jsonify({'status': 'ok'})
 
 @app.route('/api/posts', methods=['POST'])
+@admin_required
 def save_all_posts():
     data = request.json
     save_data(data)
@@ -226,6 +255,7 @@ def get_img_src(img, base_url):
     return None
 
 @app.route('/scrape_story', methods=['POST'])
+@admin_required
 def scrape_story():
     data = request.get_json()
     story_url = data.get('url')

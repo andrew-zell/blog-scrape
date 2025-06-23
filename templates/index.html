@@ -356,7 +356,11 @@
       });
       html += `<button id='add-story-to-library' style='margin-top:18px;background:#2ecc40;color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1rem;font-weight:600;cursor:pointer;'>Add to Library</button>`;
       document.getElementById('fetch-story-results').innerHTML = html;
+<<<<<<< HEAD
       document.getElementById('add-story-to-library').onclick = function() {
+=======
+      document.getElementById('add-story-to-library').onclick = async function() {
+>>>>>>> a06967e (save new stories)
         const title = document.getElementById('fetch-story-title').value;
         const images = [];
         data.images.forEach((img, i) => {
@@ -379,6 +383,15 @@
         });
         closeFetchStoryModal();
         loadAdmin();
+<<<<<<< HEAD
+=======
+        // Immediately save to backend so it persists
+        await fetch('/api/posts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(adminPosts)
+        });
+>>>>>>> a06967e (save new stories)
       };
     };
     let adminPosts = [];

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, render_template
 import requests
 import os
 import json
@@ -148,6 +148,10 @@ def manual_scrape():
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
     return jsonify(load_data())
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 @app.route('/api/posts/<path:post_id>', methods=['POST'])
 def update_post(post_id):

@@ -265,6 +265,16 @@
       <div id="fetch-story-results" style="margin-top:18px;"></div>
     </div>
   </div>
+  <!-- Add this modal just before </body> -->
+  <div id="admin-login-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:4000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:18px;max-width:400px;width:95%;color:#222;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);position:relative;">
+      <button onclick="closeAdminLoginModal()" style="position:absolute;top:12px;right:18px;font-size:2rem;background:none;border:none;color:#888;cursor:pointer;">&times;</button>
+      <h3 style="margin-top:0;">Admin Login</h3>
+      <input id="admin-login-password" type="password" placeholder="Enter admin password" style="width:90%;padding:8px 12px;font-size:1rem;border-radius:6px;border:1.5px solid #d1d5db;margin-bottom:12px;">
+      <button id="admin-login-btn" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:8px 22px;font-size:1rem;font-weight:600;cursor:pointer;">Login</button>
+      <div id="admin-login-error" style="color:#e53935;margin-top:10px;display:none;">Incorrect password.</div>
+    </div>
+  </div>
   <script>
     async function fetchRSS() {
       const res = await fetch('/feed.xml');
@@ -314,7 +324,16 @@
       }
     }
     fetchRSS();
-    document.getElementById('admin-gear').onclick = function() {
+    document.getElementById('admin-gear').onclick = async function() {
+      // Try to access a protected endpoint to check session
+      const res = await fetch('/api/posts');
+      if (res.status === 401) {
+        // Not logged in, show login modal
+        document.getElementById('admin-login-modal').style.display = 'flex';
+        document.getElementById('admin-login-password').value = '';
+        document.getElementById('admin-login-error').style.display = 'none';
+        return;
+      }
       document.getElementById('admin-modal').style.display = 'flex';
       loadAdmin();
     };
@@ -542,6 +561,40 @@
     // Allow clicking outside modal to close
     document.getElementById('admin-modal').onclick = function(e) {
       if (e.target === this) closeAdmin();
+    };
+    // Add logout button to admin modal header
+    (function() {
+      const adminHeader = document.querySelector('.admin-header');
+      if (adminHeader && !document.getElementById('admin-logout-btn')) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.id = 'admin-logout-btn';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.style = 'margin-left:18px;background:#e53935;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:1rem;font-weight:600;cursor:pointer;';
+        logoutBtn.onclick = async function() {
+          await fetch('/admin_logout', {method: 'POST'});
+          document.getElementById('admin-modal').style.display = 'none';
+          window.adminAuthenticated = false;
+        };
+        adminHeader.appendChild(logoutBtn);
+      }
+    })();
+    function closeAdminLoginModal() {
+      document.getElementById('admin-login-modal').style.display = 'none';
+    }
+    document.getElementById('admin-login-btn').onclick = async function() {
+      const password = document.getElementById('admin-login-password').value;
+      const res = await fetch('/admin_login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({password})
+      });
+      if (res.ok) {
+        document.getElementById('admin-login-modal').style.display = 'none';
+        document.getElementById('admin-modal').style.display = 'flex';
+        loadAdmin();
+      } else {
+        document.getElementById('admin-login-error').style.display = 'block';
+      }
     };
   </script>
 </body>

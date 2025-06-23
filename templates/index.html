@@ -10,57 +10,110 @@
       margin: 0;
       padding: 0;
       font-family: 'Montserrat', sans-serif;
-      background-color: #00053D;
+      background: #00053D;
+      overflow: hidden;
+    }
+    .main-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    .whats-new-section {
+      width: 320px;
+      min-width: 320px;
+      max-width: 320px;
+      background: linear-gradient(to bottom, #01D7F0 0%, #0B5FFF 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .whats-new-text {
+      color: #fff;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      user-select: none;
+    }
+    .slideshow-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
       overflow: hidden;
     }
     .slide {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
       opacity: 0;
       transition: opacity 1s ease-in-out;
-      display: none;
-      width: 100vw;
-      height: 100vh;
-      padding: 60px;
-      box-sizing: border-box;
-      text-align: center;
-      color: white;
       position: absolute;
+      left: 320px;
       top: 0;
-      left: 0;
+      height: 100vh;
+      padding: 0;
+      z-index: 1;
+      pointer-events: none;
     }
     .slide.active {
       opacity: 1;
-      z-index: 1;
-      display: block;
+      z-index: 2;
+      pointer-events: auto;
     }
-    .slide h1 {
-      font-size: 64px;
-      margin-bottom: 60px;
-      color: white;
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 36px;
+      margin-top: 0;
+      text-align: center;
+      letter-spacing: -0.5px;
+      width: 100%;
     }
     .card-grid {
       display: flex;
+      gap: 40px;
+      width: 100%;
       justify-content: center;
       align-items: flex-start;
       flex-wrap: wrap;
-      gap: 40px;
+      text-align: center;
     }
     .card {
-      background: white;
-      border-radius: 40px;
-      padding: 30px;
-      max-width: 700px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 18px 18px 12px 18px;
+      max-width: 260px;
       width: 100%;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(11,95,255,0.08);
     }
     .card img {
       width: 100%;
       height: auto;
-      border-radius: 16px;
+      border-radius: 12px;
+      background: #e0e0e0;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      margin-bottom: 12px;
     }
     .card p {
-      font-size: 24px;
-      margin-top: 20px;
+      font-size: 1.2rem;
+      margin: 0;
+      margin-top: 4px;
       color: #000;
+      font-weight: 700;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
     }
     /* Admin Modal Polishing */
     #admin-modal {
@@ -226,16 +279,23 @@
       color: #fff;
     }
     /* Responsive */
-    @media (max-width: 700px) {
-      .admin-modal-content { padding: 18px 4vw; }
-      .admin-story { flex-direction: column; }
-      .admin-story-content { width: 100%; }
-      .post-title, .img-caption { width: 95%; }
+    @media (max-width: 900px) {
+      .main-container { flex-direction: column; }
+      .whats-new-section { width: 100vw; min-width: 0; max-width: none; height: 120px; }
+      .slideshow-section { /* no padding */ }
+      .slide { left: 0; top: 120px; }
     }
   </style>
 </head>
 <body>
-  <div id="slideshow"></div>
+  <div class="main-container">
+    <div class="whats-new-section">
+      <div class="whats-new-text">What's<br>New</div>
+    </div>
+    <div class="slideshow-section">
+      <div id="slideshow"></div>
+    </div>
+  </div>
   <div id="admin-gear" style="position:fixed;top:20px;right:30px;z-index:1000;cursor:pointer; color: #fff;">
     <span style="font-size:32px;">&#9881;</span>
   </div>
@@ -305,7 +365,7 @@
         if (cards.length > 0) {
           slides.push(`
             <div class="slide">
-              <h1>${title}</h1>
+              <div class="slide-title">${title}</div>
               <div class="card-grid">${cards.join("")}</div>
             </div>
           `);

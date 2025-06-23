@@ -78,7 +78,7 @@
     }
     .card-grid {
       display: flex;
-      gap: 40px;
+      gap: 56px;
       width: 100%;
       justify-content: center;
       align-items: flex-start;
@@ -88,8 +88,8 @@
     .card {
       background: #fff;
       border-radius: 24px;
-      padding: 18px 18px 12px 18px;
-      max-width: 260px;
+      padding: 36px 36px 24px 36px;
+      max-width: 480px;
       width: 100%;
       box-sizing: border-box;
       display: flex;
@@ -102,7 +102,7 @@
       height: auto;
       border-radius: 12px;
       background: #e0e0e0;
-      aspect-ratio: 1/1;
+      aspect-ratio: 16/9;
       object-fit: cover;
       margin-bottom: 12px;
     }
@@ -333,6 +333,18 @@
       <input id="admin-login-password" type="password" placeholder="Enter admin password" style="width:90%;padding:8px 12px;font-size:1rem;border-radius:6px;border:1.5px solid #d1d5db;margin-bottom:12px;">
       <button id="admin-login-btn" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:8px 22px;font-size:1rem;font-weight:600;cursor:pointer;">Login</button>
       <div id="admin-login-error" style="color:#e53935;margin-top:10px;display:none;">Incorrect password.</div>
+    </div>
+  </div>
+  <!-- Add Custom Story Modal (place before </body>) -->
+  <div id="custom-story-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:3500;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:18px;max-width:600px;width:95%;color:#222;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);position:relative;font-family:'Montserrat',sans-serif;">
+      <button onclick="closeCustomStoryModal()" style="position:absolute;top:12px;right:18px;font-size:2rem;background:none;border:none;color:#888;cursor:pointer;">&times;</button>
+      <h3 style="margin-top:0;">Add Custom Story</h3>
+      <input id="custom-story-title" type="text" placeholder="Story Title" style="width:90%;padding:8px 12px;font-size:1rem;border-radius:6px;border:1.5px solid #d1d5db;margin-bottom:16px;">
+      <div id="custom-story-images"></div>
+      <button id="add-custom-image-btn" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:6px 18px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;margin-bottom:18px;">+ Add Image</button>
+      <div id="custom-story-error" style="color:#e53935;margin-bottom:10px;display:none;"></div>
+      <button id="save-custom-story-btn" style="background:#2ecc40;color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1rem;font-weight:600;cursor:pointer;">Save Story</button>
     </div>
   </div>
   <script>
@@ -655,6 +667,92 @@
       } else {
         document.getElementById('admin-login-error').style.display = 'block';
       }
+    };
+    // Add 'Add Custom Story' button to admin modal header
+    (function() {
+      const adminHeader = document.querySelector('.admin-header');
+      if (adminHeader && !document.getElementById('add-custom-story-btn')) {
+        const customBtn = document.createElement('button');
+        customBtn.id = 'add-custom-story-btn';
+        customBtn.textContent = 'Add Custom Story';
+        customBtn.style = 'margin-left:18px;background:#1976d2;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:1rem;font-weight:600;cursor:pointer;';
+        customBtn.onclick = function() {
+          openCustomStoryModal();
+        };
+        adminHeader.insertBefore(customBtn, adminHeader.firstChild.nextSibling); // after h2
+      }
+    })();
+    function openCustomStoryModal() {
+      document.getElementById('custom-story-title').value = '';
+      document.getElementById('custom-story-images').innerHTML = '';
+      document.getElementById('custom-story-error').style.display = 'none';
+      addCustomImageField();
+      document.getElementById('custom-story-modal').style.display = 'flex';
+    }
+    function closeCustomStoryModal() {
+      document.getElementById('custom-story-modal').style.display = 'none';
+    }
+    function addCustomImageField(url = '', caption = '') {
+      const container = document.getElementById('custom-story-images');
+      const idx = container.children.length;
+      const div = document.createElement('div');
+      div.style = 'display:flex;align-items:center;margin-bottom:10px;';
+      div.innerHTML = `
+        <input type="text" class="custom-img-url" placeholder="Image URL" value="${url}" style="width:38%;padding:6px 8px;font-size:1rem;border-radius:5px;border:1px solid #d1d5db;margin-right:8px;">
+        <input type="text" class="custom-img-caption" placeholder="Caption" value="${caption}" style="width:48%;padding:6px 8px;font-size:1rem;border-radius:5px;border:1px solid #d1d5db;margin-right:8px;">
+        <button class="remove-custom-img-btn" style="background:#e53935;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:1.1rem;cursor:pointer;">&times;</button>
+      `;
+      div.querySelector('.remove-custom-img-btn').onclick = function() {
+        div.remove();
+      };
+      container.appendChild(div);
+    }
+    document.getElementById('add-custom-image-btn').onclick = function() {
+      addCustomImageField();
+    };
+    document.getElementById('save-custom-story-btn').onclick = async function() {
+      const title = document.getElementById('custom-story-title').value.trim();
+      const errorDiv = document.getElementById('custom-story-error');
+      const imgUrls = Array.from(document.querySelectorAll('.custom-img-url'));
+      const imgCaptions = Array.from(document.querySelectorAll('.custom-img-caption'));
+      let valid = true;
+      if (!title) {
+        errorDiv.textContent = 'Please enter a story title.';
+        errorDiv.style.display = 'block';
+        valid = false;
+      }
+      const images = [];
+      for (let i = 0; i < imgUrls.length; i++) {
+        const url = imgUrls[i].value.trim();
+        const caption = imgCaptions[i].value.trim();
+        if (!url) {
+          errorDiv.textContent = 'Please enter an image URL for each image.';
+          errorDiv.style.display = 'block';
+          valid = false;
+          break;
+        }
+        images.push({src: url, caption, include: true});
+      }
+      if (!valid) return;
+      if (images.length === 0) {
+        errorDiv.textContent = 'Please add at least one image.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+      // Add to adminPosts and persist
+      adminPosts.unshift({
+        id: 'custom-' + Date.now(),
+        title,
+        images,
+        include: false
+      });
+      closeCustomStoryModal();
+      loadAdmin();
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(adminPosts)
+      });
     };
   </script>
 </body>

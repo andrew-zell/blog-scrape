@@ -45,7 +45,7 @@
       overflow: hidden;
     }
     .slide {
-      width: 100%;
+      width: 85%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -128,17 +128,18 @@
       align-items: center;
       justify-content: center;
       transition: background 0.3s;
+      font-family: 'Montserrat', sans-serif;
     }
     .admin-modal-content {
-      background: #fff;
-      padding: 40px 36px 32px 36px;
-      border-radius: 24px;
-      max-width: 950px;
-      width: 95%;
+      background: #f7fafd;
+      padding: 48px 40px 36px 40px;
+      border-radius: 28px;
+      max-width: 1000px;
+      width: 98%;
       color: #222;
-      max-height: 90vh;
+      max-height: 92vh;
       overflow: auto;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
       position: relative;
       animation: fadeIn 0.3s;
     }
@@ -150,13 +151,20 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 32px;
+      gap: 18px;
     }
     .admin-header h2 {
-      font-size: 2.2rem;
-      font-weight: 700;
+      font-size: 2.3rem;
+      font-weight: 800;
       margin: 0;
       color: #1a237e;
+      letter-spacing: -1px;
+    }
+    .admin-header .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
     .close-btn {
       background: none;
@@ -173,16 +181,17 @@
       color: #e53935;
     }
     .admin-story {
-      border:1px solid #e0e0e0;
-      padding:24px 20px 18px 20px;
-      margin-bottom:24px;
-      border-radius:14px;
-      position:relative;
-      background: #f9f9fb;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1.5px solid #e3e8f0;
+      padding: 32px 28px 22px 28px;
+      margin-bottom: 28px;
+      border-radius: 18px;
+      position: relative;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(11,95,255,0.04);
       transition: box-shadow 0.2s, background 0.2s;
       display: flex;
       align-items: flex-start;
+      gap: 18px;
     }
     .admin-story.dragging {
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
@@ -205,14 +214,15 @@
     }
     .post-title {
       font-size: 1.1rem;
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #d1d5db;
       margin-left: 8px;
       margin-bottom: 6px;
       width: 55%;
       background: #f5f7fa;
       transition: border 0.2s;
+      font-family: 'Montserrat', sans-serif;
     }
     .post-title:focus {
       border: 1.5px solid #1976d2;
@@ -225,36 +235,85 @@
     }
     .img-caption {
       font-size: 1rem;
-      padding: 4px 8px;
-      border-radius: 5px;
-      border: 1px solid #d1d5db;
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: 1.5px solid #d1d5db;
       background: #f5f7fa;
       margin-left: 8px;
       width: 60%;
       margin-bottom: 4px;
       transition: border 0.2s;
+      font-family: 'Montserrat', sans-serif;
     }
     .img-caption:focus {
       border: 1.5px solid #1976d2;
       outline: none;
     }
-    .save-all-btn {
+    .save-all-btn, #add-custom-story-btn, #admin-logout-btn {
       background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 12px 32px;
       font-size: 1.1rem;
       font-weight: 700;
       cursor: pointer;
-      margin-bottom: 20px;
+      margin-bottom: 0;
       transition: background 0.2s, box-shadow 0.2s;
       box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+      margin-right: 0;
+      margin-left: 0;
     }
     .save-all-btn:disabled {
       background: #b0bec5;
       cursor: not-allowed;
       box-shadow: none;
+    }
+    #fetch-stories-btn {
+      background: #fff;
+      color: #1976d2;
+      border: 1.5px solid #1976d2;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-right: 0;
+      margin-left: 0;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+    }
+    #fetch-stories-btn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+    .delete-story-btn {
+      background: none;
+      border: none;
+      color: #e53935;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-left: 12px;
+      border-radius: 50%;
+      padding: 4px 10px;
+      transition: background 0.2s;
+    }
+    .delete-story-btn:hover {
+      background: #ffeaea;
+    }
+    .collapse-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      margin-right: 8px;
+      color: #1976d2;
+      border-radius: 50%;
+      padding: 2px 8px;
+      transition: background 0.2s;
+    }
+    .collapse-btn:hover {
+      background: #e3f2fd;
     }
     .save-indicator {
       color: #2ecc40;
@@ -262,21 +321,14 @@
       margin-left: 16px;
       font-size: 1.1rem;
     }
-    #fetch-stories-btn {
-      background: #fff;
-      color: #1976d2;
-      border: 1.5px solid #1976d2;
-      border-radius: 8px;
-      padding: 10px 22px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-right: 16px;
-      transition: background 0.2s, color 0.2s;
+    #fetch-loading {
+      display: none;
+      margin-left: 10px;
+      color: #0074d9;
+      font-size: 1.1rem;
     }
-    #fetch-stories-btn:hover {
-      background: #1976d2;
-      color: #fff;
+    #admin-content {
+      margin-top: 18px;
     }
     /* Responsive */
     @media (max-width: 900px) {
@@ -284,6 +336,13 @@
       .whats-new-section { width: 100vw; min-width: 0; max-width: none; height: 120px; }
       .slideshow-section { /* no padding */ }
       .slide { left: 0; top: 120px; }
+    }
+    @media (max-width: 700px) {
+      .admin-modal-content { padding: 18px 4vw; }
+      .admin-story { flex-direction: column; }
+      .admin-story-content { width: 100%; }
+      .post-title, .img-caption { width: 95%; }
+      .admin-header { flex-direction: column; gap: 8px; }
     }
   </style>
 </head>
@@ -754,6 +813,17 @@
         body: JSON.stringify(adminPosts)
       });
     };
+    // Wrap admin-header actions in a container for better alignment
+    (function() {
+      const adminHeader = document.querySelector('.admin-header');
+      if (adminHeader && !adminHeader.querySelector('.admin-header-actions')) {
+        const actions = Array.from(adminHeader.querySelectorAll('button, #save-all-btn, #fetch-stories-btn, #add-custom-story-btn, #admin-logout-btn, .save-indicator'));
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'admin-header-actions';
+        actions.forEach(el => actionsDiv.appendChild(el));
+        adminHeader.appendChild(actionsDiv);
+      }
+    })();
   </script>
 </body>
 </html> 

@@ -10,6 +10,7 @@ from io import BytesIO
 import re
 from urllib.parse import urljoin
 from functools import wraps
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 # Use environment variables for secrets; set these in your environment for production!
@@ -17,27 +18,40 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'changeme-please')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'changeme123')
 DATA_FILE = 'data.json'
 RSS_SOURCE = 'zoom_blog_feed_v3.xml'  # Or a URL if you want live fetching
+USERS_FILE = 'users.json'
+GROUPS_FILE = 'groups.json'
 
 # --- Admin session decorator ---
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('admin'):
+        if not session.get('admin') or not session.get('username'):
             return jsonify({'error': 'Unauthorized'}), 401
         return f(*args, **kwargs)
     return decorated_function
 
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        return {}
+    with open(USERS_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
 @app.route('/admin_login', methods=['POST'])
 def admin_login():
     data = request.get_json()
-    if data.get('password') == ADMIN_PASSWORD:
+    username = data.get('username')
+    password = data.get('password')
+    users = load_users()
+    if username in users and check_password_hash(users[username], password):
         session['admin'] = True
-        return jsonify({'success': True})
+        session['username'] = username
+        return jsonify({'success': True, 'username': username})
     return jsonify({'success': False}), 401
 
 @app.route('/admin_logout', methods=['POST'])
 def admin_logout():
     session.pop('admin', None)
+    session.pop('username', None)
     return jsonify({'success': True})
 
 def parse_rss():
@@ -285,5 +299,83 @@ def scrape_story():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+def load_groups():
+    if not os.path.exists(GROUPS_FILE):
+        return {'groups': ['Default'], 'active': 'Default'}
+    with open(GROUPS_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_groups(groups_data):
+    with open(GROUPS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(groups_data, f, indent=2)
+
+def ensure_story_groups(data):
+    for story in data:
+        # Migrate 'group' to 'groups' array
+        if 'group' in story:
+            if 'groups' not in story:
+                story['groups'] = [story['group']]
+            del story['group']
+        if 'groups' not in story:
+            story['groups'] = ['Default']
+    return data
+
+@app.route('/groups', methods=['GET', 'POST'])
+def groups_endpoint():
+    if request.method == 'POST':
+        data = request.get_json()
+        groups = data.get('groups')
+        active = data.get('active')
+        if not groups or not isinstance(groups, list) or not active or active not in groups:
+            return jsonify({'success': False, 'error': 'Invalid group data'}), 400
+        save_groups({'groups': groups, 'active': active})
+        return jsonify({'success': True})
+    else:
+        return jsonify(load_groups())
+
+@app.route('/active_group', methods=['GET', 'POST'])
+def active_group():
+    groups_data = load_groups()
+    if request.method == 'POST':
+        new_active = request.json.get('active')
+        if new_active and new_active in groups_data['groups']:
+            groups_data['active'] = new_active
+            save_groups(groups_data)
+            return jsonify({'success': True, 'active': new_active})
+        return jsonify({'success': False, 'error': 'Invalid group'}), 400
+    return jsonify({'active': groups_data['active']})
+
+@app.route('/stories', methods=['GET'])
+def get_stories():
+    group = request.args.get('group')
+    data = ensure_story_groups(load_data())
+    groups_data = load_groups()
+    active = groups_data.get('active', 'Default')
+    if group:
+        return jsonify([s for s in data if group in s.get('groups', ['Default'])])
+    # Default: return only stories in the active group
+    return jsonify([s for s in data if active in s.get('groups', ['Default'])])
+
+@app.route('/save_stories', methods=['POST'])
+def save_stories():
+    data = request.get_json()
+    stories = data.get('stories')
+    if stories is not None:
+        # Ensure groups property is set
+        for s in stories:
+            if 'groups' not in s:
+                s['groups'] = ['Default']
+            # Remove legacy 'group' property if present
+            if 'group' in s:
+                del s['group']
+        save_data(stories)
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'error': 'No stories provided'}), 400
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True) 
+ 

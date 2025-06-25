@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zoom Blog Slideshow (Grouped by Story)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: #00053D;
+      overflow: hidden;
+    }
+    .main-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    .whats-new-section {
+      width: 320px;
+      min-width: 320px;
+      max-width: 320px;
+      background: linear-gradient(to bottom, #01D7F0 0%, #0B5FFF 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .whats-new-text {
+      color: #fff;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      user-select: none;
+    }
+    .slideshow-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
+      overflow: hidden;
+    }
+    .slide {
+      width: 85%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      position: absolute;
+      left: 320px;
+      top: 0;
+      height: 100vh;
+      padding: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .slide.active {
+      opacity: 1;
+      z-index: 2;
+      pointer-events: auto;
+    }
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 36px;
+      margin-top: 0;
+      text-align: center;
+      letter-spacing: -0.5px;
+      width: 100%;
+    }
+    .card-grid {
+      display: flex;
+      gap: 56px;
+      width: 100%;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 36px 36px 24px 36px;
+      max-width: 480px;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(11,95,255,0.08);
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: #e0e0e0;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 1.2rem;
+      margin: 0;
+      margin-top: 4px;
+      color: #000;
+      font-weight: 700;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+    }
+    /* Admin Modal Polishing */
+    #admin-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.45);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .admin-modal-content {
+      background: #f7fafd;
+      padding: 48px 40px 36px 40px;
+      border-radius: 28px;
+      max-width: 1000px;
+      width: 98%;
+      color: #222;
+      max-height: 92vh;
+      overflow: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      position: relative;
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 18px;
+    }
+    .admin-header h2 {
+      font-size: 2.3rem;
+      font-weight: 800;
+      margin: 0;
+      color: #1a237e;
+      letter-spacing: -1px;
+    }
+    .admin-header .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 2.2rem;
+      color: #888;
+      cursor: pointer;
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #e53935;
+    }
+    .admin-story {
+      border: 1.5px solid #e3e8f0;
+      padding: 32px 28px 22px 28px;
+      margin-bottom: 28px;
+      border-radius: 18px;
+      position: relative;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(11,95,255,0.04);
+      transition: box-shadow 0.2s, background 0.2s;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .admin-story.dragging {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      background: #e3f2fd;
+      opacity: 0.85;
+    }
+    .drag-handle {
+      cursor: grab;
+      font-size: 22px;
+      user-select: none;
+      margin-right: 18px;
+      color: #90a4ae;
+      transition: color 0.2s;
+    }
+    .drag-handle:hover {
+      color: #1976d2;
+    }
+    .admin-story-content {
+      flex: 1;
+    }
+    .post-title {
+      font-size: 1.1rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #d1d5db;
+      margin-left: 8px;
+      margin-bottom: 6px;
+      width: 55%;
+      background: #f5f7fa;
+      transition: border 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .post-title:focus {
+      border: 1.5px solid #1976d2;
+      outline: none;
+    }
+    .story-visibility {
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .img-caption {
+      font-size: 1rem;
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: 1.5px solid #d1d5db;
+      background: #f5f7fa;
+      margin-left: 8px;
+      width: 60%;
+      margin-bottom: 4px;
+      transition: border 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .img-caption:focus {
+      border: 1.5px solid #1976d2;
+      outline: none;
+    }
+    .save-all-btn, #add-custom-story-btn, #admin-logout-btn {
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+      margin-right: 0;
+      margin-left: 0;
+    }
+    .save-all-btn:disabled {
+      background: #b0bec5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    #fetch-stories-btn {
+      background: #fff;
+      color: #1976d2;
+      border: 1.5px solid #1976d2;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-right: 0;
+      margin-left: 0;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+    }
+    #fetch-stories-btn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+    .delete-story-btn {
+      background: none;
+      border: none;
+      color: #e53935;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-left: 12px;
+      border-radius: 50%;
+      padding: 4px 10px;
+      transition: background 0.2s;
+    }
+    .delete-story-btn:hover {
+      background: #ffeaea;
+    }
+    .collapse-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      margin-right: 8px;
+      color: #1976d2;
+      border-radius: 50%;
+      padding: 2px 8px;
+      transition: background 0.2s;
+    }
+    .collapse-btn:hover {
+      background: #e3f2fd;
+    }
+    .save-indicator {
+      color: #2ecc40;
+      font-weight: bold;
+      margin-left: 16px;
+      font-size: 1.1rem;
+    }
+    #fetch-loading {
+      display: none;
+      margin-left: 10px;
+      color: #0074d9;
+      font-size: 1.1rem;
+    }
+    #admin-content {
+      margin-top: 18px;
+    }
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main-container { flex-direction: column; }
+      .whats-new-section { width: 100vw; min-width: 0; max-width: none; height: 120px; }
+      .slideshow-section { /* no padding */ }
+      .slide { left: 0; top: 120px; }
+    }
+    @media (max-width: 700px) {
+      .admin-modal-content { padding: 18px 4vw; }
+      .admin-story { flex-direction: column; }
+      .admin-story-content { width: 100%; }
+      .post-title, .img-caption { width: 95%; }
+      .admin-header { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="whats-new-section">
+      <div class="whats-new-text">What's<br>New</div>
+    </div>
+    <div class="slideshow-section">
+      <div id="slideshow"></div>
+    </div>
+  </div>
+  <div id="admin-gear" style="position:fixed;top:20px;right:30px;z-index:1000;cursor:pointer; color: #fff;">
+    <span style="font-size:32px;">&#9881;</span>
+  </div>
+  <div id="admin-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:2000;align-items:center;justify-content:center;">
+    <div class="admin-modal-content">
+      <button class="close-btn" onclick="closeAdmin()" title="Close">&times;</button>
+      <div class="admin-header">
+        <h2>Edit Blog Posts</h2>
+        <div>
+          <button id="fetch-stories-btn">Fetch New Story</button>
+          <button id="save-all-btn" class="save-all-btn" disabled>Save All</button>
+          <span id="save-all-indicator" class="save-indicator" style="display:none;">Saved!</span>
+        </div>
+      </div>
+      <span id="fetch-loading" style="display:none; margin-left:10px; color:#0074d9;">Fetching...</span>
+      <div id="admin-content"></div>
+    </div>
+  </div>
+  <!-- Fetch Story Modal -->
+  <div id="fetch-story-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:3000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:18px;max-width:600px;width:95%;color:#222;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);position:relative;">
+      <button onclick="closeFetchStoryModal()" style="position:absolute;top:12px;right:18px;font-size:2rem;background:none;border:none;color:#888;cursor:pointer;">&times;</button>
+      <h3 style="margin-top:0;">Add Story by URL</h3>
+      <input id="fetch-story-url" type="text" placeholder="Paste Zoom blog story URL here" style="width:90%;padding:8px 12px;font-size:1rem;border-radius:6px;border:1.5px solid #d1d5db;margin-bottom:12px;">
+      <button id="fetch-story-go" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:8px 22px;font-size:1rem;font-weight:600;cursor:pointer;">Fetch</button>
+      <div id="fetch-story-loading" style="display:none;margin-top:10px;color:#1976d2;">Fetching...</div>
+      <div id="fetch-story-results" style="margin-top:18px;"></div>
+    </div>
+  </div>
+  <!-- Add this modal just before </body> -->
+  <div id="admin-login-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:4000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:18px;max-width:400px;width:95%;color:#222;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);position:relative;">
+      <button onclick="closeAdminLoginModal()" style="position:absolute;top:12px;right:18px;font-size:2rem;background:none;border:none;color:#888;cursor:pointer;">&times;</button>
+      <h3 style="margin-top:0;">Admin Login</h3>
+      <input id="admin-login-password" type="password" placeholder="Enter admin password" style="width:90%;padding:8px 12px;font-size:1rem;border-radius:6px;border:1.5px solid #d1d5db;margin-bottom:12px;">
+      <button id="admin-login-btn" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:8px 22px;font-size:1rem;font-weight:600;cursor:pointer;">Login</button>
+      <div id="admin-login-error" style="color:#e53935;margin-top:10px;display:none;">Incorrect password.</div>
+    </div>
+  </div>
+  <!-- Add Custom Story Modal (place before </body>) -->
+  <div id="custom-story-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:3500;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:18px;max-width:600px;width:95%;color:#222;max-height:90vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,0.18);position:relative;font-family:'Montserrat',sans-serif;">
+      <button onclick="closeCustomStoryModal()" style="position:absolute;top:12px;right:18px;font-size:2rem;background:none;border:none;color:#888;cursor:pointer;">&times;</button>
+      <h3 style="margin-top:0;">Add Custom Story</h3>
+      <input id="custom-story-title" type="text" placeholder="Story Title" style="width:90%;padding:8px 12px;font-size:1rem;border-radius:6px;border:1.5px solid #d1d5db;margin-bottom:16px;">
+      <div id="custom-story-images"></div>
+      <button id="add-custom-image-btn" style="background:#1976d2;color:#fff;border:none;border-radius:6px;padding:6px 18px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:8px;margin-bottom:18px;">+ Add Image</button>
+      <div id="custom-story-error" style="color:#e53935;margin-bottom:10px;display:none;"></div>
+      <button id="save-custom-story-btn" style="background:#2ecc40;color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1rem;font-weight:600;cursor:pointer;">Save Story</button>
+    </div>
+  </div>
+  <script>
+    async function fetchRSS() {
+      const res = await fetch('/feed.xml');
+      const text = await res.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, "application/xml");
+      const items = Array.from(xml.querySelectorAll("item"));
+      const container = document.getElementById("slideshow");
+      const slides = [];
+      items.forEach(item => {
+        const title = item.querySelector("title").textContent;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = item.querySelector("description").textContent;
+        const blocks = tempDiv.querySelectorAll("div");
+        const cards = [];
+        blocks.forEach(block => {
+          const img = block.querySelector("img");
+          const caption = block.querySelector("p");
+          if (img && caption) {
+            cards.push(`
+              <div class="card">
+                <img src="${img.src}" />
+                <p>${caption.textContent}</p>
+              </div>
+            `);
+          }
+        });
+        if (cards.length > 0) {
+          slides.push(`
+            <div class="slide">
+              <div class="slide-title">${title}</div>
+              <div class="card-grid">${cards.join("")}</div>
+            </div>
+          `);
+        }
+      });
+      container.innerHTML = slides.join("");
+      let index = 0;
+      const allSlides = container.querySelectorAll(".slide");
+      if (allSlides.length > 0) {
+        allSlides[0].classList.add("active");
+        setInterval(() => {
+          allSlides[index].classList.remove("active");
+          index = (index + 1) % allSlides.length;
+          allSlides[index].classList.add("active");
+        }, 12000);
+      }
+    }
+    fetchRSS();
+    document.getElementById('admin-gear').onclick = async function() {
+      // Try to access a protected endpoint to check session
+      const res = await fetch('/api/posts');
+      if (res.status === 401) {
+        // Not logged in, show login modal
+        document.getElementById('admin-login-modal').style.display = 'flex';
+        document.getElementById('admin-login-password').value = '';
+        document.getElementById('admin-login-error').style.display = 'none';
+        return;
+      }
+      document.getElementById('admin-modal').style.display = 'flex';
+      loadAdmin();
+    };
+    function closeAdmin() {
+      document.getElementById('admin-modal').style.display = 'none';
+    }
+    document.getElementById('fetch-stories-btn').onclick = function() {
+      document.getElementById('fetch-story-modal').style.display = 'flex';
+      document.getElementById('fetch-story-url').value = '';
+      document.getElementById('fetch-story-results').innerHTML = '';
+      document.getElementById('fetch-story-loading').style.display = 'none';
+    };
+    function closeFetchStoryModal() {
+      document.getElementById('fetch-story-modal').style.display = 'none';
+    }
+    document.getElementById('fetch-story-go').onclick = async function() {
+      const url = document.getElementById('fetch-story-url').value.trim();
+      if (!url) return;
+      document.getElementById('fetch-story-loading').style.display = 'block';
+      document.getElementById('fetch-story-results').innerHTML = '';
+      const res = await fetch('/scrape_story', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url})
+      });
+      document.getElementById('fetch-story-loading').style.display = 'none';
+      if (!res.ok) {
+        document.getElementById('fetch-story-results').innerHTML = '<div style="color:#e53935;">Failed to fetch story.</div>';
+        return;
+      }
+      const data = await res.json();
+      if (!data.images || data.images.length === 0) {
+        document.getElementById('fetch-story-results').innerHTML = '<div style="color:#e53935;">No images found in this story.</div>';
+        return;
+      }
+      let html = `<div style='margin-bottom:10px;'><b>Story Title:</b> <input id='fetch-story-title' type='text' value="${data.title.replace(/"/g, '&quot;')}" style='width:70%;padding:4px 8px;border-radius:5px;border:1px solid #d1d5db;'></div>`;
+      data.images.forEach((img, i) => {
+        html += `<div style='display:flex;align-items:center;margin-bottom:10px;'><input type='checkbox' class='fetch-story-img-include' data-idx='${i}' checked style='margin-right:8px;'><img src='${img.src}' style='height:60px;margin-right:10px;border-radius:6px;'><input type='text' class='fetch-story-img-caption' data-idx='${i}' value="${img.caption.replace(/"/g, '&quot;')}" style='width:60%;padding:4px 8px;border-radius:5px;border:1px solid #d1d5db;'></div>`;
+      });
+      html += `<button id='add-story-to-library' style='margin-top:18px;background:#2ecc40;color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1rem;font-weight:600;cursor:pointer;'>Add to Library</button>`;
+      document.getElementById('fetch-story-results').innerHTML = html;
+      document.getElementById('add-story-to-library').onclick = async function() {
+        const title = document.getElementById('fetch-story-title').value;
+        const images = [];
+        data.images.forEach((img, i) => {
+          const include = document.querySelector(`.fetch-story-img-include[data-idx='${i}']`).checked;
+          const caption = document.querySelector(`.fetch-story-img-caption[data-idx='${i}']`).value;
+          if (include) {
+            images.push({src: img.src, caption, include: true});
+          }
+        });
+        if (images.length === 0) {
+          alert('Please select at least one image to add.');
+          return;
+        }
+        // Add to adminPosts and re-render admin UI
+        adminPosts.unshift({
+          id: data.url,
+          title,
+          images,
+          include: false
+        });
+        closeFetchStoryModal();
+        loadAdmin();
+        // Immediately save to backend so it persists
+        await fetch('/api/posts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(adminPosts)
+        });
+      };
+    };
+    let adminPosts = [];
+    let adminChanged = false;
+    function markChanged() {
+      adminChanged = true;
+      document.getElementById('save-all-btn').disabled = false;
+      document.getElementById('save-all-indicator').style.display = 'none';
+    }
+    function markSaved() {
+      adminChanged = false;
+      document.getElementById('save-all-btn').disabled = true;
+      document.getElementById('save-all-indicator').style.display = 'inline';
+      setTimeout(() => { document.getElementById('save-all-indicator').style.display = 'none'; }, 1500);
+    }
+    async function loadAdmin() {
+      const res = await fetch('/api/posts');
+      adminPosts = await res.json();
+      adminChanged = false;
+      document.getElementById('save-all-btn').disabled = true;
+      document.getElementById('save-all-indicator').style.display = 'none';
+      let html = '<div id="admin-stories-list">';
+      adminPosts.forEach((post, i) => {
+        const storyId = `story-${i}`;
+        html += `<div class="admin-story" data-index="${i}">
+          <span class="drag-handle">&#9776;</span>
+          <div class="admin-story-content">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;">
+                <button class="collapse-btn" data-idx="${i}" style="background:none;border:none;font-size:1.3rem;cursor:pointer;margin-right:8px;color:#1976d2;">&#9660;</button>
+                <label>
+                  <input type="checkbox" data-post="${post.id}" class="post-include" ${post.include ? 'checked' : ''}>
+                  <input type="text" data-post="${post.id}" class="post-title" value="${post.title.replace(/\"/g, '&quot;')}" style="font-weight:bold; width:60%;">
+                </label>
+                <span class="story-visibility" style="margin-left:10px; font-weight:bold; color:${post.include ? '#2ecc40' : '#ff4136'};">${post.include ? 'Visible' : 'Hidden'}</span>
+              </div>
+              <button class="delete-story-btn" data-idx="${i}" title="Delete Story" style="background:none;border:none;color:#e53935;font-size:1.5rem;cursor:pointer;margin-left:12px;">&times;</button>
+            </div>
+            <div class="story-details" id="story-details-${i}">
+              <div style="margin-left:30px;">`;
+        post.images.forEach((img, j) => {
+          const isHidden = !post.include || !img.include;
+          html += `<div style="margin-bottom:10px; opacity:${isHidden ? 0.5 : 1};">
+            <label>
+              <input type="checkbox" data-post="${post.id}" data-img="${j}" class="img-include" ${img.include ? 'checked' : ''} ${!post.include ? 'disabled' : ''}>
+              <img src="${img.src}" style="height:60px;vertical-align:middle;">
+            </label>
+            <input type="text" data-post="${post.id}" data-img="${j}" class="img-caption" value="${img.caption.replace(/\"/g, '&quot;')}" style="width:60%;" ${!post.include ? 'disabled' : ''}>
+          </div>`;
+        });
+        html += `</div>
+            </div>
+          </div>
+        </div>
+      `;
+      });
+      html += '</div>';
+      document.getElementById('admin-content').innerHTML = html;
+      // Drag-and-drop reordering
+      const el = document.getElementById('admin-stories-list');
+      Sortable.create(el, {
+        animation: 150,
+        handle: '.drag-handle',
+        onStart: function (evt) {
+          evt.item.classList.add('dragging');
+        },
+        onEnd: function (evt) {
+          evt.item.classList.remove('dragging');
+          const oldIndex = evt.oldIndex;
+          const newIndex = evt.newIndex;
+          if (oldIndex !== newIndex) {
+            const moved = adminPosts.splice(oldIndex, 1)[0];
+            adminPosts.splice(newIndex, 0, moved);
+            markChanged();
+          }
+        }
+      });
+      // Add event listeners for checkboxes and captions
+      document.querySelectorAll('.post-include, .post-title, .img-include, .img-caption').forEach(el => {
+        el.oninput = el.onchange = function() {
+          const parent = this.closest('.admin-story');
+          const idx = parseInt(parent.getAttribute('data-index'));
+          const post = adminPosts[idx];
+          if (this.classList.contains('post-include')) {
+            post.include = this.checked;
+          }
+          if (this.classList.contains('post-title')) {
+            post.title = this.value;
+          }
+          if (this.classList.contains('img-include')) {
+            const imgIdx = parseInt(this.getAttribute('data-img'));
+            post.images[imgIdx].include = this.checked;
+          }
+          if (this.classList.contains('img-caption')) {
+            const imgIdx = parseInt(this.getAttribute('data-img'));
+            post.images[imgIdx].caption = this.value;
+          }
+          // Update visibility label and gray out images/captions
+          const visLabel = parent.querySelector('.story-visibility');
+          visLabel.textContent = post.include ? 'Visible' : 'Hidden';
+          visLabel.style.color = post.include ? '#2ecc40' : '#ff4136';
+          parent.querySelectorAll('.img-include').forEach(cb => { cb.disabled = !post.include; });
+          parent.querySelectorAll('.img-caption').forEach(input => { input.disabled = !post.include; });
+          parent.querySelectorAll('div[style*="margin-bottom:10px;"]').forEach((div, idx2) => {
+            const imgCb = parent.querySelectorAll('.img-include')[idx2];
+            div.style.opacity = (!post.include || !imgCb.checked) ? 0.5 : 1;
+          });
+          markChanged();
+        };
+      });
+      // Collapsible stories
+      document.querySelectorAll('.collapse-btn').forEach(btn => {
+        btn.onclick = function() {
+          const idx = this.getAttribute('data-idx');
+          const details = document.getElementById('story-details-' + idx);
+          if (details.style.display === 'none') {
+            details.style.display = '';
+            this.innerHTML = '&#9660;';
+          } else {
+            details.style.display = 'none';
+            this.innerHTML = '&#9654;';
+          }
+        };
+      });
+      // Delete story
+      document.querySelectorAll('.delete-story-btn').forEach(btn => {
+        btn.onclick = async function() {
+          const idx = parseInt(this.getAttribute('data-idx'));
+          if (confirm('Are you sure you want to delete this story?')) {
+            adminPosts.splice(idx, 1);
+            await fetch('/api/posts', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(adminPosts)
+            });
+            loadAdmin();
+            // Show a brief deleted indicator
+            const indicator = document.getElementById('save-all-indicator');
+            indicator.textContent = 'Deleted!';
+            indicator.style.display = 'inline';
+            setTimeout(() => { indicator.style.display = 'none'; indicator.textContent = 'Saved!'; }, 1500);
+          }
+        };
+      });
+    }
+    document.getElementById('save-all-btn').onclick = async function() {
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(adminPosts)
+      });
+      markSaved();
+      fetchRSS();
+    };
+    // Allow clicking outside modal to close
+    document.getElementById('admin-modal').onclick = function(e) {
+      if (e.target === this) closeAdmin();
+    };
+    // Add logout button to admin modal header
+    (function() {
+      const adminHeader = document.querySelector('.admin-header');
+      if (adminHeader && !document.getElementById('admin-logout-btn')) {
+        const logoutBtn = document.createElement('button');
+        logoutBtn.id = 'admin-logout-btn';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.style = 'margin-left:18px;background:#e53935;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:1rem;font-weight:600;cursor:pointer;';
+        logoutBtn.onclick = async function() {
+          await fetch('/admin_logout', {method: 'POST'});
+          document.getElementById('admin-modal').style.display = 'none';
+          window.adminAuthenticated = false;
+        };
+        adminHeader.appendChild(logoutBtn);
+      }
+    })();
+    function closeAdminLoginModal() {
+      document.getElementById('admin-login-modal').style.display = 'none';
+    }
+    document.getElementById('admin-login-btn').onclick = async function() {
+      const password = document.getElementById('admin-login-password').value;
+      const res = await fetch('/admin_login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({password})
+      });
+      if (res.ok) {
+        document.getElementById('admin-login-modal').style.display = 'none';
+        document.getElementById('admin-modal').style.display = 'flex';
+        loadAdmin();
+      } else {
+        document.getElementById('admin-login-error').style.display = 'block';
+      }
+    };
+    // Add 'Add Custom Story' button to admin modal header
+    (function() {
+      const adminHeader = document.querySelector('.admin-header');
+      if (adminHeader && !document.getElementById('add-custom-story-btn')) {
+        const customBtn = document.createElement('button');
+        customBtn.id = 'add-custom-story-btn';
+        customBtn.textContent = 'Add Custom Story';
+        customBtn.style = 'margin-left:18px;background:#1976d2;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:1rem;font-weight:600;cursor:pointer;';
+        customBtn.onclick = function() {
+          openCustomStoryModal();
+        };
+        adminHeader.insertBefore(customBtn, adminHeader.firstChild.nextSibling); // after h2
+      }
+    })();
+    function openCustomStoryModal() {
+      document.getElementById('custom-story-title').value = '';
+      document.getElementById('custom-story-images').innerHTML = '';
+      document.getElementById('custom-story-error').style.display = 'none';
+      addCustomImageField();
+      document.getElementById('custom-story-modal').style.display = 'flex';
+    }
+    function closeCustomStoryModal() {
+      document.getElementById('custom-story-modal').style.display = 'none';
+    }
+    function addCustomImageField(url = '', caption = '') {
+      const container = document.getElementById('custom-story-images');
+      const idx = container.children.length;
+      const div = document.createElement('div');
+      div.style = 'display:flex;align-items:center;margin-bottom:10px;';
+      div.innerHTML = `
+        <input type="text" class="custom-img-url" placeholder="Image URL" value="${url}" style="width:38%;padding:6px 8px;font-size:1rem;border-radius:5px;border:1px solid #d1d5db;margin-right:8px;">
+        <input type="text" class="custom-img-caption" placeholder="Caption" value="${caption}" style="width:48%;padding:6px 8px;font-size:1rem;border-radius:5px;border:1px solid #d1d5db;margin-right:8px;">
+        <button class="remove-custom-img-btn" style="background:#e53935;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:1.1rem;cursor:pointer;">&times;</button>
+      `;
+      div.querySelector('.remove-custom-img-btn').onclick = function() {
+        div.remove();
+      };
+      container.appendChild(div);
+    }
+    document.getElementById('add-custom-image-btn').onclick = function() {
+      addCustomImageField();
+    };
+    document.getElementById('save-custom-story-btn').onclick = async function() {
+      const title = document.getElementById('custom-story-title').value.trim();
+      const errorDiv = document.getElementById('custom-story-error');
+      const imgUrls = Array.from(document.querySelectorAll('.custom-img-url'));
+      const imgCaptions = Array.from(document.querySelectorAll('.custom-img-caption'));
+      let valid = true;
+      if (!title) {
+        errorDiv.textContent = 'Please enter a story title.';
+        errorDiv.style.display = 'block';
+        valid = false;
+      }
+      const images = [];
+      for (let i = 0; i < imgUrls.length; i++) {
+        const url = imgUrls[i].value.trim();
+        const caption = imgCaptions[i].value.trim();
+        if (!url) {
+          errorDiv.textContent = 'Please enter an image URL for each image.';
+          errorDiv.style.display = 'block';
+          valid = false;
+          break;
+        }
+        images.push({src: url, caption, include: true});
+      }
+      if (!valid) return;
+      if (images.length === 0) {
+        errorDiv.textContent = 'Please add at least one image.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+      // Add to adminPosts and persist
+      adminPosts.unshift({
+        id: 'custom-' + Date.now(),
+        title,
+        images,
+        include: false
+      });
+      closeCustomStoryModal();
+      loadAdmin();
+      await fetch('/api/posts', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(adminPosts)
+      });
+    };
+    // Wrap admin-header actions in a container for better alignment
+    (function() {
+      const adminHeader = document.querySelector('.admin-header');
+      if (adminHeader && !adminHeader.querySelector('.admin-header-actions')) {
+        const actions = Array.from(adminHeader.querySelectorAll('button, #save-all-btn, #fetch-stories-btn, #add-custom-story-btn, #admin-logout-btn, .save-indicator'));
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'admin-header-actions';
+        actions.forEach(el => actionsDiv.appendChild(el));
+        adminHeader.appendChild(actionsDiv);
+      }
+    })();
+  </script>
+</body>
+</html> 

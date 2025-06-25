@@ -1,0 +1,13 @@
+{
+  "groups": [
+    "Default",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "test",
+    "another group",
+    "another group 2"
+  ],
+  "active": "Second"
+}

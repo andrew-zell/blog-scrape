@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zoom Blog Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: #f7fafd;
+    }
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100vw;
+    }
+    .group-sidebar {
+      width: 320px;
+      background: #f8fbfd;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 40px 0 0 0;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .group-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 18px;
+    }
+    .group-item {
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a237e;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s;
+    }
+    .group-item.active {
+      background: #e3e8f0;
+      color: #1976d2;
+    }
+    .group-item .group-actions {
+      display: flex;
+      gap: 4px;
+    }
+    #add-group-btn {
+      margin: 0 18px 12px 18px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: none;
+      color: #1976d2;
+      font-size: 2rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    #add-group-btn:hover {
+      background: #e3e8f0;
+    }
+    .admin-container.flat {
+      flex: 1;
+      max-width: 1600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: none;
+      padding: 40px 32px;
+      min-width: 0;
+    }
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 18px;
+    }
+    .admin-header h2 {
+      font-size: 2.3rem;
+      font-weight: 800;
+      margin: 0;
+      color: #1a237e;
+      letter-spacing: -1px;
+    }
+    .admin-header .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .save-all-btn, #add-custom-story-btn, #fetch-story-btn {
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: none;
+      margin-right: 0;
+      margin-left: 0;
+    }
+    .save-all-btn:disabled {
+      background: #b0bec5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    #fetch-story-btn {
+      background: #fff;
+      color: #1976d2;
+      border: 1.5px solid #1976d2;
+    }
+    #fetch-story-btn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+    .save-indicator {
+      color: #2ecc40;
+      font-weight: bold;
+      margin-left: 16px;
+      font-size: 1.1rem;
+    }
+    #fetch-loading {
+      display: none;
+      margin-left: 10px;
+      color: #0074d9;
+      font-size: 1.1rem;
+    }
+    #admin-story-list {
+      margin-top: 18px;
+    }
+    .admin-story {
+      border: 1.5px solid #e3e8f0;
+      padding: 32px 28px 22px 28px;
+      margin-bottom: 28px;
+      border-radius: 18px;
+      position: relative;
+      background: #fff;
+      box-shadow: none;
+      transition: box-shadow 0.2s, background 0.2s;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .admin-story.dragging {
+      background: #e3f2fd;
+      opacity: 0.85;
+    }
+    .drag-handle {
+      cursor: grab;
+      font-size: 22px;
+      user-select: none;
+      margin-right: 18px;
+      color: #90a4ae;
+      transition: color 0.2s;
+    }
+    .drag-handle:hover {
+      color: #1976d2;
+    }
+    .admin-story-content {
+      flex: 1;
+    }
+    .post-title {
+      font-size: 1.1rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #d1d5db;
+      margin-left: 8px;
+      margin-bottom: 6px;
+      width: 55%;
+      background: #f5f7fa;
+      transition: border 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .post-title:focus {
+      border: 1.5px solid #1976d2;
+      outline: none;
+    }
+    .story-visibility {
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .img-caption {
+      font-size: 1rem;
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: 1.5px solid #d1d5db;
+      background: #f5f7fa;
+      margin-left: 8px;
+      width: 60%;
+      margin-bottom: 4px;
+      transition: border 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .img-caption:focus {
+      border: 1.5px solid #1976d2;
+      outline: none;
+    }
+    .delete-story-btn {
+      background: none;
+      border: none;
+      color: #e53935;
+      font-size: 1.5rem;
+      cursor: pointer;
+      margin-left: 12px;
+      border-radius: 50%;
+      padding: 4px 10px;
+      transition: background 0.2s;
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 2;
+    }
+    .delete-story-btn:hover {
+      background: #ffeaea;
+    }
+    .admin-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+      gap: 20px;
+    }
+    .admin-image-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f9f9f9;
+    }
+    .admin-image-card img {
+      width: 100%;
+      border-radius: 5px;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: #e0e0e0;
+    }
+    .admin-image-card textarea {
+      width: 100%;
+      height: 60px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 7px;
+      margin-top: 10px;
+      padding: 5px;
+      box-sizing: border-box;
+      resize: vertical;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .admin-image-card textarea:focus {
+      border: 1.5px solid #1976d2;
+      outline: none;
+    }
+    .admin-image-card label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 900px) {
+      .admin-layout { flex-direction: column; }
+      .group-sidebar { width: 100vw; border-right: none; border-bottom: 1px solid #e3e8f0; flex-direction: row; padding: 0; }
+      .group-list { flex-direction: row; gap: 8px; padding: 0 8px; }
+      #add-group-btn { margin: 0 8px 0 0; }
+      .admin-container.flat { padding: 18px 4vw; }
+      .admin-story { flex-direction: column; }
+      .admin-story-content { width: 100%; }
+      .post-title, .img-caption { width: 95%; }
+      .admin-header { flex-direction: column; gap: 8px; }
+    }
+    .add-image-btn {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .add-image-fields {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .add-image-fields input {
+      padding: 6px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .add-image-fields button {
+      background: #42a5f5;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .url-modal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    .url-modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 10px;
+      text-align: center;
+      position: relative;
+      top: 20vh;
+    }
+    .sidebar-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+      height: 2.1em;
+    }
+    .sidebar-header {
+      margin: 0 0 8px 0;
+      font-size: 2.1em;
+      font-weight: bold;
+      color: #111;
+      text-align: left;
+      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      line-height: 1;
+      height: 2.1em;
+    }
+    .sidebar-add-btn {
+      background: none;
+      border: none;
+      color: #1976d2;
+      font-size: 1.5em;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0 4px;
+      margin: 0;
+      line-height: 1;
+      border-radius: 50%;
+      transition: background 0.2s;
+      height: 1.5em;
+      width: 1.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar-add-btn:hover {
+      background: #e3e8f0;
+    }
+    .groups-list, .stories-list, .group-stories {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 12px 0;
+    }
+    .group-li {
+      font-size: 1.08em;
+      margin-bottom: 2px;
+      color: #222;
+      background: none;
+      border: none;
+      padding: 0 0 0 2px;
+      box-shadow: none;
+      cursor: pointer;
+      font-weight: 400;
+      transition: background 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      border-radius: 5px;
+    }
+    .group-li.active {
+      color: #111;
+      background: #f2f6fa;
+      font-weight: 700;
+    }
+    .group-li:active, .group-li:focus, .group-li:hover {
+      outline: none;
+      background: #e3e8f0;
+      color: #1976d2;
+    }
+    .group-chevron {
+      font-size: 1.1em;
+      margin-right: 2px;
+      color: #888;
+      width: 1em;
+      display: inline-block;
+      text-align: center;
+    }
+    .group-active-badge {
+      background: #19c37d;
+      color: #fff;
+      font-size: 0.7em;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 2px 8px;
+      margin-left: 8px;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      display: inline-block;
+    }
+    .group-dot { display: none; }
+    .group-eye { display: none; }
+    .group-stories {
+      margin-left: 18px;
+      color: #bbb;
+      font-size: 0.97em;
+      font-weight: 400;
+      margin-bottom: 2px;
+      margin-top: 2px;
+      border-left: 2px solid #e3e8f0;
+      padding-left: 12px;
+    }
+    .group-stories li {
+      color: #bbb;
+      font-size: 0.97em;
+      font-weight: 400;
+      margin-bottom: 1px;
+      padding-left: 0;
+      background: none;
+      border: none;
+    }
+    .story-li {
+      font-size: 1.13em;
+      margin-bottom: 2px;
+      color: #111;
+      font-weight: 500;
+      background: none;
+      border: none;
+      padding: 0 0 0 2px;
+      box-shadow: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      border-radius: 5px;
+    }
+    .story-li:active, .story-li:focus, .story-li:hover {
+      outline: none;
+      background: #e3e8f0;
+      color: #1976d2;
+    }
+    .groups-section, .stories-section {
+      margin: 0;
+      padding: 0 0 0 24px;
+    }
+    body, .admin-layout, .group-sidebar, .admin-container, .sidebar-header, .group-li, .story-li, .group-stories li {
+      font-family: 'Inter', 'Montserrat', Arial, sans-serif;
+    }
+    .sidebar-heading-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+    .sidebar-plus-btn {
+      background: #00053D;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-left: 4px;
+    }
+    .sidebar-plus-btn:hover {
+      background: #1A237E;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-heading-row">
+          <h2 class="sidebar-heading">Groups</h2>
+          <button id="add-group-btn" class="sidebar-plus-btn" title="Add Group">+</button>
+        </div>
+        <ul class="group-list" id="groups-list"></ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading-row">
+          <h2 class="sidebar-heading">Stories</h2>
+        </div>
+        <ul class="stories-list" id="sidebar-stories-list"></ul>
+      </div>
+    </aside>
+    <main class="main-panel" id="main-panel">
+      <header class="main-header">
+        <h1 class="main-title" id="main-title">Select a group or story</h1>
+        <div class="admin-header-actions">
+          <button id="add-custom-story-btn" class="primary-btn">Custom Story</button>
+          <button id="fetch-story-btn" class="primary-btn">Fetch Story</button>
+          <button id="set-active-btn" class="secondary-btn">Set Active</button>
+          <button id="save-all-btn" class="primary-btn">Save All</button>
+        </div>
+      </header>
+      <section id="admin-story-list"></section>
+    </main>
+  </div>
+  <!-- Custom Story Modal -->
+  <div id="custom-story-modal" class="url-modal" style="display: none;">
+    <div class="url-modal-content">
+      <span class="close-custom-story-modal">&times;</span>
+      <h2>Add Custom Story</h2>
+      <input type="text" id="custom-story-title" placeholder="Story Title">
+      <button id="submit-custom-story">Add Story</button>
+    </div>
+  </div>
+  <!-- Fetch Story URL Modal -->
+  <div id="fetch-url-modal" class="url-modal" style="display: none;">
+    <div class="url-modal-content">
+      <span class="close-url-modal">&times;</span>
+      <h2>Fetch a New Story</h2>
+      <p>Enter the URL of a Zoom Blog post to scrape:</p>
+      <input type="text" id="story-url-input" placeholder="https://blog.zoom.us/...">
+      <button id="submit-story-url">Fetch Story</button>
+      <div id="fetch-loading" style="display: none;">Fetching, please wait...</div>
+    </div>
+  </div>
+  <div id="toast" style="display:none;position:fixed;top:24px;right:24px;z-index:9999;padding:16px 32px;background:#6c63ff;color:#fff;border-radius:8px;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-family:'Montserrat',sans-serif;">Saved!</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- STATE ---
+      let groups = [];
+      let expandedGroups = new Set();
+      let activeGroup = null;
+      let activeStory = null;
+      let slideshowGroup = null;
+      let allStories = [];
+      let groupOrders = {};
+      let hasUnsavedChanges = false;
+
+      // --- DOM ELEMENTS ---
+      const groupsList = document.getElementById('groups-list');
+      const adminStoryList = document.getElementById('admin-story-list');
+      const saveAllBtn = document.getElementById('save-all-btn');
+      const fetchStoryBtn = document.getElementById('fetch-story-btn');
+      const fetchUrlModal = document.getElementById('fetch-url-modal');
+      const closeUrlModalBtn = fetchUrlModal.querySelector('.close-url-modal');
+      const submitStoryUrlBtn = document.getElementById('submit-story-url');
+      const storyUrlInput = document.getElementById('story-url-input');
+      const fetchLoadingIndicator = document.getElementById('fetch-loading');
+      const addCustomStoryBtn = document.getElementById('add-custom-story-btn');
+      const customStoryModal = document.getElementById('custom-story-modal');
+      const closeCustomStoryModalBtn = customStoryModal.querySelector('.close-custom-story-modal');
+      const submitCustomStoryBtn = document.getElementById('submit-custom-story');
+      const customStoryTitleInput = document.getElementById('custom-story-title');
+      const addGroupBtn = document.getElementById('add-group-btn');
+      const setActiveBtn = document.getElementById('set-active-btn');
+      const mainTitle = document.getElementById('main-title');
+      const toast = document.getElementById('toast');
+      const sidebarStoriesList = document.getElementById('sidebar-stories-list');
+
+      // --- GROUPS LOGIC ---
+      async function loadGroups() {
+        const res = await fetch('/groups');
+        const data = await res.json();
+        groups = data.groups;
+        slideshowGroup = data.active;
+        if (!groups.includes(slideshowGroup)) slideshowGroup = groups[0] || null;
+        if (!groups.includes(activeGroup)) activeGroup = slideshowGroup;
+        if (!expandedGroups.size && activeGroup) expandedGroups.add(activeGroup);
+        // Initialize groupOrders if not present
+        groups.forEach(g => { if (!groupOrders[g]) groupOrders[g] = []; });
+        renderSidebar();
+      }
+      function renderSidebar() {
+        groupsList.innerHTML = '';
+        groups.forEach(group => {
+          const li = document.createElement('li');
+          li.className = 'group-li' + (group === activeGroup ? ' active' : '');
+          // Chevron
+          const chevron = document.createElement('span');
+          chevron.className = 'group-chevron';
+          chevron.textContent = expandedGroups.has(group) ? '▼' : '▶';
+          chevron.onclick = e => {
+            e.stopPropagation();
+            if (expandedGroups.has(group)) expandedGroups.delete(group);
+            else expandedGroups.add(group);
+            renderSidebar();
+          };
+          li.appendChild(chevron);
+          // Group name
+          const groupName = document.createElement('span');
+          groupName.textContent = group;
+          groupName.style.flex = '1';
+          groupName.onclick = () => selectGroup(group);
+          groupName.tabIndex = 0;
+          groupName.style.cursor = 'pointer';
+          li.appendChild(groupName);
+          // Active badge
+          if (group === slideshowGroup) {
+            const badge = document.createElement('span');
+            badge.className = 'group-active-badge';
+            badge.textContent = 'ACTIVE';
+            li.appendChild(badge);
+          }
+          // Add story button
+          const addStoryBtn = document.createElement('button');
+          addStoryBtn.className = 'sidebar-plus-btn';
+          addStoryBtn.title = 'Add Story';
+          addStoryBtn.textContent = '+';
+          addStoryBtn.onclick = e => {
+            e.stopPropagation();
+            handleAddCustomStory(group);
+          };
+          li.appendChild(addStoryBtn);
+          groupsList.appendChild(li);
+          // Nested stories (multi-group, per-group order)
+          if (expandedGroups.has(group)) {
+            const ul = document.createElement('ul');
+            ul.className = 'group-stories';
+            // Use groupOrders for this group
+            let groupStoryIds = groupOrders[group] || [];
+            let groupStories = groupStoryIds.map(id => allStories.find(s => s.id === id)).filter(Boolean);
+            // Add any missing stories (e.g., new ones) at the end
+            const extraStories = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(group) && !groupStoryIds.includes(s.id));
+            groupStories = groupStories.concat(extraStories);
+            groupStories.forEach(story => {
+              const storyLi = document.createElement('li');
+              storyLi.textContent = story.title;
+              storyLi.className = 'story-li' + (activeStory && story.id === activeStory.id ? ' active' : '');
+              storyLi.onclick = () => selectStory(story);
+              ul.appendChild(storyLi);
+            });
+            ul.style.marginLeft = '8px';
+            groupsList.appendChild(ul);
+          }
+        });
+        // Render all stories in the sidebar stories section
+        sidebarStoriesList.innerHTML = '';
+        allStories.forEach(story => {
+          const li = document.createElement('li');
+          li.textContent = story.title;
+          li.className = 'story-li';
+          if (activeStory && story.id === activeStory.id) {
+            li.classList.add('active');
+          }
+          li.onclick = () => selectStory(story);
+          sidebarStoriesList.appendChild(li);
+        });
+      }
+      function selectGroup(group) {
+        activeGroup = group;
+        activeStory = null;
+        mainTitle.textContent = `Editing Group: ${group}`;
+        renderSidebar();
+        renderAdminPanel();
+      }
+      function selectStory(story) {
+        activeStory = story;
+        activeGroup = story.group;
+        mainTitle.textContent = `Editing Story: ${story.title}`;
+        renderSidebar();
+        renderAdminPanel();
+      }
+      async function addGroup() {
+        const name = prompt('New group name:');
+        if (!name || groups.includes(name)) return;
+        groups.push(name);
+        await saveGroups();
+        expandedGroups.add(name);
+        selectGroup(name);
+      }
+      async function saveGroups() {
+        await fetch('/groups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ groups, active: slideshowGroup })
+        });
+      }
+      addGroupBtn.addEventListener('click', addGroup);
+
+      // --- STORIES LOGIC ---
+      async function loadAllStories() {
+        const res = await fetch('/stories');
+        allStories = await res.json();
+        // Initialize groupOrders for all groups
+        groups.forEach(g => {
+          if (!groupOrders[g]) {
+            groupOrders[g] = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(g)).map(s => s.id);
+          }
+        });
+        renderSidebar();
+        renderAdminPanel();
+      }
+      function renderAdminPanel() {
+        adminStoryList.innerHTML = '';
+        if (activeStory) {
+          // Render story card for editing
+          const storyElement = document.createElement('div');
+          storyElement.className = 'admin-story';
+          storyElement.dataset.storyId = activeStory.id;
+          // Group labels with red X
+          let groupLabels = `<div class="group-labels-row"><div class="group-labels">${(activeStory.groups||[]).map(g => `
+            <span class="group-label">${g} <button class="remove-group-btn" data-group="${g}" title="Remove from group">&times;</button></span>
+          `).join('')}</div>
+          <div class="add-group-dropdown-wrap">${groups.length > (activeStory.groups||[]).length ? `<select class="add-group-dropdown"><option value="">Add to group...</option>${groups.filter(g => !(activeStory.groups||[]).includes(g)).map(g => `<option value="${g}">${g}</option>`).join('')}</select>` : ''}</div></div>`;
+          // Add Image UI
+          let addImageFields = `
+            <div class="add-image-fields" style="display:none;">
+              <input type="text" class="new-image-url" placeholder="Image URL">
+              <input type="text" class="new-image-caption" placeholder="Caption">
+              <button class="confirm-add-image-btn">Add</button>
+            </div>
+            <button class="add-image-btn">Add Image</button>
+          `;
+          let imagesHTML = `<div class="admin-images-grid">${(activeStory.images || []).map((image, imgIndex) => `
+              <div class="admin-image-card" data-story-index="${imgIndex}">
+                  <img src="${image.src}" alt="story image" class="story-image-preview">
+                  <div class="image-meta">
+                    <textarea class="img-caption">${image.caption}</textarea>
+                    <div class="image-controls">
+                      <label class="image-visible-label">Visible <input type="checkbox" class="image-visibility-toggle" ${image.include !== false ? 'checked' : ''}></label>
+                      <button class="delete-image-btn" data-img-index="${imgIndex}" title="Delete Image">&times;</button>
+                    </div>
+                  </div>
+              </div>
+          `).join('')}</div>`;
+          storyElement.innerHTML = `
+            <div class="admin-story-content">
+                <div class="admin-story-header-row">
+                  <input type="text" class="post-title" value="${activeStory.title}">
+                  <button class="delete-story-btn" title="Delete Story">Delete</button>
+                </div>
+                ${groupLabels}
+                ${imagesHTML}
+                ${addImageFields}
+            </div>
+          `;
+          adminStoryList.appendChild(storyElement);
+          addAdminEventListeners();
+        } else if (activeGroup) {
+          // Show all stories in the selected group with drag handles, per-group order
+          let groupStoryIds = groupOrders[activeGroup] || [];
+          let groupStories = groupStoryIds.map(id => allStories.find(s => s.id === id)).filter(Boolean);
+          // Add any missing stories (e.g., new ones) at the end
+          const extraStories = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(activeGroup) && !groupStoryIds.includes(s.id));
+          groupStories = groupStories.concat(extraStories);
+          if (groupStories.length === 0) {
+            adminStoryList.innerHTML = `<div style="font-size:1.2rem;color:#888;">No stories in this group. Add a new story to this group.</div>`;
+          } else {
+            const list = document.createElement('ul');
+            list.className = 'main-group-story-list';
+            groupStories.forEach(story => {
+              const li = document.createElement('li');
+              li.className = 'main-group-story-li';
+              li.innerHTML = `<span class="drag-handle">⠿</span> <span class="group-story-title">${story.title}</span>`;
+              li.setAttribute('data-story-id', story.id);
+              li.onclick = (e) => {
+                // Only select if not clicking the drag handle
+                if (!e.target.classList.contains('drag-handle')) selectStory(story);
+              };
+              list.appendChild(li);
+            });
+            adminStoryList.appendChild(list);
+            // Enable drag-and-drop reordering
+            new Sortable(list, {
+              animation: 150,
+              handle: '.drag-handle',
+              onEnd: function () {
+                const newOrder = Array.from(list.querySelectorAll('.main-group-story-li')).map(el => el.getAttribute('data-story-id'));
+                groupOrders[activeGroup] = newOrder;
+                markChanges();
+                renderSidebar();
+                renderAdminPanel();
+              }
+            });
+          }
+        } else {
+          adminStoryList.innerHTML = `<div style="font-size:1.2rem;color:#888;">Select a group or story from the sidebar.</div>`;
+        }
+      }
+      function addAdminEventListeners() {
+        const storyElement = document.querySelector('.admin-story');
+        if (!storyElement) return;
+        storyElement.querySelector('.post-title').addEventListener('input', function() {
+          activeStory.title = this.value;
+          markChanges();
+          renderSidebar();
+          mainTitle.textContent = `Editing Story: ${activeStory.title}`;
+        });
+        storyElement.querySelectorAll('.image-visibility-toggle').forEach((el, idx) => {
+          el.addEventListener('change', function() {
+            activeStory.images[idx].include = this.checked;
+            markChanges();
+          });
+        });
+        storyElement.querySelectorAll('.delete-image-btn').forEach((btn, idx) => {
+          btn.addEventListener('click', function() {
+            activeStory.images.splice(idx, 1);
+            markChanges();
+            renderAdminPanel();
+          });
+        });
+        // Add image
+        storyElement.querySelector('.add-image-btn').addEventListener('click', function() {
+          const fields = this.previousElementSibling;
+          fields.style.display = fields.style.display === 'none' ? 'flex' : 'none';
+        });
+        storyElement.querySelector('.confirm-add-image-btn').addEventListener('click', function() {
+          const fields = this.parentElement;
+          const url = fields.querySelector('.new-image-url').value.trim();
+          const caption = fields.querySelector('.new-image-caption').value.trim();
+          if (url) {
+            activeStory.images.push({ src: url, caption: caption, include: true });
+            markChanges();
+            renderAdminPanel();
+          }
+        });
+        // Remove group from story
+        storyElement.querySelectorAll('.remove-group-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const group = this.getAttribute('data-group');
+            if (!activeStory.groups) activeStory.groups = [];
+            activeStory.groups = activeStory.groups.filter(g => g !== group);
+            // Remove from groupOrders
+            if (groupOrders[group]) {
+              groupOrders[group] = groupOrders[group].filter(id => id !== activeStory.id);
+            }
+            markChanges();
+            renderAdminPanel();
+            renderSidebar();
+          });
+        });
+        // Add to group
+        const addGroupDropdown = storyElement.querySelector('.add-group-dropdown');
+        if (addGroupDropdown) {
+          addGroupDropdown.addEventListener('change', function() {
+            const group = this.value;
+            if (group) {
+              if (!activeStory.groups) activeStory.groups = [];
+              if (!activeStory.groups.includes(group)) {
+                activeStory.groups.push(group);
+                // Add to groupOrders
+                if (!groupOrders[group]) groupOrders[group] = [];
+                groupOrders[group].push(activeStory.id);
+                markChanges();
+                renderAdminPanel();
+                renderSidebar();
+              }
+              this.value = '';
+            }
+          });
+        }
+        // Delete story button
+        storyElement.querySelector('.delete-story-btn').addEventListener('click', function() {
+          if (confirm('Are you sure you want to delete this story? This cannot be undone.')) {
+            allStories = allStories.filter(s => s.id !== activeStory.id);
+            activeStory = null;
+            markChanges();
+            renderSidebar();
+            renderAdminPanel();
+          }
+        });
+      }
+      function markChanges() {
+        hasUnsavedChanges = true;
+        saveAllBtn.disabled = false;
+        showToast('Unsaved changes');
+      }
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 1800);
+      }
+      // --- Custom Story Modal Logic ---
+      addCustomStoryBtn.addEventListener('click', () => {
+        customStoryModal.style.display = 'flex';
+        customStoryTitleInput.value = '';
+      });
+      closeCustomStoryModalBtn.addEventListener('click', () => {
+        customStoryModal.style.display = 'none';
+      });
+      submitCustomStoryBtn.addEventListener('click', () => {
+        handleAddCustomStory(activeGroup);
+        customStoryModal.style.display = 'none';
+      });
+      function handleAddCustomStory(group) {
+        const title = customStoryTitleInput.value.trim() || 'New Custom Story';
+        const newStory = {
+          id: `custom_${Date.now()}`,
+          title,
+          link: '',
+          include: true,
+          images: [],
+          group: group || activeGroup || groups[0] || null
+        };
+        allStories.unshift(newStory);
+        activeStory = newStory;
+        markChanges();
+        renderSidebar();
+        renderAdminPanel();
+      }
+      // --- Fetch Story Modal Logic ---
+      fetchStoryBtn.addEventListener('click', () => {
+        fetchUrlModal.style.display = 'flex';
+        storyUrlInput.value = '';
+      });
+      closeUrlModalBtn.addEventListener('click', () => {
+        fetchUrlModal.style.display = 'none';
+      });
+      window.addEventListener('click', (e) => {
+        if (e.target === fetchUrlModal) fetchUrlModal.style.display = 'none';
+        if (e.target === customStoryModal) customStoryModal.style.display = 'none';
+      });
+      submitStoryUrlBtn.addEventListener('click', handleFetchStory);
+      async function handleFetchStory() {
+        const url = storyUrlInput.value.trim();
+        if (!url) return;
+        fetchLoadingIndicator.style.display = 'block';
+        submitStoryUrlBtn.disabled = true;
+        try {
+          const response = await fetch('/scrape_story', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Scraping failed');
+          }
+          const newStory = await response.json();
+          newStory.group = activeGroup;
+          allStories.unshift(newStory);
+          activeStory = newStory;
+          markChanges();
+          renderSidebar();
+          renderAdminPanel();
+          fetchUrlModal.style.display = 'none';
+          showToast('Story fetched!');
+        } catch (error) {
+          console.error('Error fetching story:', error);
+          alert(`Failed to fetch story: ${error.message}`);
+        } finally {
+          fetchLoadingIndicator.style.display = 'none';
+          submitStoryUrlBtn.disabled = false;
+        }
+      }
+      // --- Set Active Group ---
+      setActiveBtn.addEventListener('click', async () => {
+        if (!activeGroup) return;
+        const res = await fetch('/active_group', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ active: activeGroup })
+        });
+        if (res.ok) {
+          slideshowGroup = activeGroup;
+          renderSidebar();
+          showToast('Active group set!');
+        }
+      });
+      // --- Save All Stories ---
+      saveAllBtn.addEventListener('click', saveAllStories);
+      async function saveAllStories() {
+        try {
+          const response = await fetch('/save_stories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({stories: allStories, groupOrders})
+          });
+          if (!response.ok) throw new Error('Failed to save stories');
+          hasUnsavedChanges = false;
+          saveAllBtn.disabled = true;
+          showToast('All changes saved!');
+        } catch(error) {
+          console.error('Error saving stories:', error);
+          alert('Could not save changes. Please check the console for errors.');
+        }
+      }
+      // --- INITIAL LOAD ---
+      loadGroups().then(loadAllStories);
+      // --- Warn on unsaved changes ---
+      window.addEventListener('beforeunload', function (e) {
+        if (hasUnsavedChanges) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

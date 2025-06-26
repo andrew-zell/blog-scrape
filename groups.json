@@ -1,13 +1,12 @@
 {
   "groups": [
-    "Default",
-    "Second",
-    "Third",
+    "Default Group",
+    "I'm a different group",
+    "Group No 3",
     "Fourth",
     "Fifth",
     "test",
-    "another group",
-    "another group 2"
+    "another group"
   ],
-  "active": "Second"
+  "active": "Default Group"
 }

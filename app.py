@@ -351,19 +351,28 @@ def active_group():
 
 @app.route('/stories', methods=['GET'])
 def get_stories():
-    group = request.args.get('group')
     data = ensure_story_groups(load_data())
-    groups_data = load_groups()
-    active = groups_data.get('active', 'Default')
+    group = request.args.get('group')
     if group:
-        return jsonify([s for s in data if group in s.get('groups', ['Default'])])
-    # Default: return only stories in the active group
-    return jsonify([s for s in data if active in s.get('groups', ['Default'])])
+        # Load groupOrders from disk
+        group_orders = {}
+        if os.path.exists('group_orders.json'):
+            with open('group_orders.json', 'r', encoding='utf-8') as f:
+                group_orders = json.load(f)
+        group_story_ids = group_orders.get(group, [])
+        id_to_story = {s['id']: s for s in data}
+        ordered_stories = [id_to_story[sid] for sid in group_story_ids if sid in id_to_story]
+        # Append any stories in the group not in groupOrders (for robustness)
+        extra_stories = [s for s in data if group in s.get('groups', ['Default']) and s['id'] not in group_story_ids]
+        return jsonify(ordered_stories + extra_stories)
+    # Default: return all stories
+    return jsonify(data)
 
 @app.route('/save_stories', methods=['POST'])
 def save_stories():
     data = request.get_json()
     stories = data.get('stories')
+    group_orders = data.get('groupOrders')
     if stories is not None:
         # Ensure groups property is set
         for s in stories:
@@ -373,8 +382,19 @@ def save_stories():
             if 'group' in s:
                 del s['group']
         save_data(stories)
+        # Save groupOrders if provided
+        if group_orders is not None:
+            with open('group_orders.json', 'w', encoding='utf-8') as f:
+                json.dump(group_orders, f, indent=2)
         return jsonify({'success': True})
     return jsonify({'success': False, 'error': 'No stories provided'}), 400
+
+@app.route('/group_orders', methods=['GET'])
+def get_group_orders():
+    if os.path.exists('group_orders.json'):
+        with open('group_orders.json', 'r', encoding='utf-8') as f:
+            return jsonify(json.load(f))
+    return jsonify({})
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True) 

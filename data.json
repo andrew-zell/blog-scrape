@@ -1,69 +1,77 @@
 [
   {
-    "id": "https://media.zoom.com/images/assets/ZVA+UI+in+action.png/Zz01YWVlMTE5ZTQ4OWYxMWYwOTU5NGUyNGVkYTlhYjhmMw==",
+    "groups": [
+      "Default Group"
+    ],
+    "id": "custom_1750948799966",
     "images": [
       {
-        "caption": "Zoom Virtual Agent manages complex customer inquiries autonomously.",
+        "caption": "maybe the caption",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/ZVA+UI+in+action.png/Zz01YWVlMTE5ZTQ4OWYxMWYwOTU5NGUyNGVkYTlhYjhmMw=="
-      },
-      {
-        "caption": "Zoom Virtual Agent manages complex customer inquiries autonomously.",
-        "include": false,
-        "src": "https://media.zoom.com/images/assets/ZVA+UI+in+action.png/Zz01YWVlMTE5ZTQ4OWYxMWYwOTU5NGUyNGVkYTlhYjhmMw=="
-      },
-      {
-        "caption": "Updated CX Analytics dashboard for Zoom Contact Center enhances how teams monitor metrics.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/CX+blog/Zz1kNjU4ZjQ2ODQ1OGMxMWYwYTc1ZjA2ZWQ3MDcxNTUzZQ=="
+        "src": "https://media.zoom.com/images/assets/Zoom+innovations+news+blog.png/Zz1iZDgyMGU5NDFhY2ExMWYwYWYzMGJhNDgxYmM5YTAyMQ==?t=20250626013556"
       }
     ],
     "include": true,
-    "title": "Zoom AI Announcements"
+    "link": "",
+    "title": "Custom story"
   },
   {
-    "id": "https://media.zoom.com/images/assets/Zoom+Tasks+News+Blog2.jpg/Zz05Y2VjZDQyMjFhZjAxMWYwOGZkOTE2MmFhODM0NWE1ZA==",
+    "groups": [
+      "Default Group"
+    ],
+    "id": "custom_1750884517640",
     "images": [
       {
-        "caption": "Zoom Tasks helps users tackle their to-do lists.",
+        "caption": "bikes",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/Zoom+Tasks+News+Blog2.jpg/Zz05Y2VjZDQyMjFhZjAxMWYwOGZkOTE2MmFhODM0NWE1ZA=="
+        "src": "https://images.pexels.com/photos/5464925/pexels-photo-5464925.jpeg"
       },
       {
-        "caption": "Zoom Tasks helps users tackle their to-do lists.",
-        "include": false,
-        "src": "https://media.zoom.com/images/assets/Zoom+Tasks+News+Blog2.jpg/Zz05Y2VjZDQyMjFhZjAxMWYwOGZkOTE2MmFhODM0NWE1ZA=="
+        "caption": "another photo and a longer caption",
+        "include": true,
+        "src": "https://images.pexels.com/photos/289869/pexels-photo-289869.jpeg"
       },
       {
-        "caption": "I wrote my own caption here as a test. ",
+        "caption": "third photo",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/custom+meeting+news+blog.png/Zz1iYWNmODdmODFhY2ExMWYwYmE2YjhlNTEyMDczODgxNg=="
-      },
-      {
-        "caption": "AI playbooks for Zoom Revenue Accelerator streamlines sales processes.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/ZWP+Dashboard+news+blog.png/Zz1iYWU1YjU0NjFhY2ExMWYwYTk2YjZhYmY5YzNiNzRmNg=="
-      },
-      {
-        "caption": "Gather sales insights through deal explorer for Zoom Revenue Accelerator to save time.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/Zoom+Phone+News+Blog.png/Zz1lOWEzNWY0YzFiMjMxMWYwYWZmNWJhZDIzZjg1MGQ2Zg=="
+        "src": "https://images.pexels.com/photos/100582/pexels-photo-100582.jpeg"
       }
     ],
     "include": true,
-    "title": "The Story TItle"
+    "link": "",
+    "title": "bicycles"
   },
   {
-    "id": "https://media.zoom.com/images/assets/TV.jpg/Zz02ODE0NmExODQ2NjQxMWYwODhhNWJhZjUwNTAxNDkxZg==",
+    "groups": [
+      "Group No 3"
+    ],
+    "id": "custom_1750884175735",
+    "images": [
+      {
+        "caption": "outside",
+        "include": true,
+        "src": "https://images.pexels.com/photos/10828941/pexels-photo-10828941.jpeg"
+      },
+      {
+        "caption": "outside again",
+        "include": true,
+        "src": "https://images.pexels.com/photos/10828941/pexels-photo-10828941.jpeg"
+      }
+    ],
+    "include": true,
+    "link": "",
+    "title": "testing story"
+  },
+  {
+    "groups": [
+      "Default Group",
+      "Third Group"
+    ],
+    "id": "fetched_1750884478864",
     "images": [
       {
         "caption": "Creating more immersive experiences with Google Beam.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/TV.jpg/Zz02ODE0NmExODQ2NjQxMWYwODhhNWJhZjUwNTAxNDkxZg=="
-      },
-      {
-        "caption": "Creating more immersive experiences with Google Beam.",
-        "include": false,
         "src": "https://media.zoom.com/images/assets/TV.jpg/Zz02ODE0NmExODQ2NjQxMWYwODhhNWJhZjUwNTAxNDkxZg=="
       },
       {
@@ -88,90 +96,61 @@
       }
     ],
     "include": true,
-    "title": "Zoom Platform Overview"
+    "title": "New innovations for Zoom Spaces",
+    "url": "https://www.zoom.com/en/blog/innovations-for-zoom-spaces/"
   },
   {
-    "id": "https://media.zoom.com/images/assets/AOTM+header+image/Zz1kZTdlOWZlY2UzMmQxMWVmYjZlZTc2OTA2NzgyMmE0NQ==?t=20250623024612",
+    "groups": [
+      "Default Group",
+      "Group No 3",
+      "I'm a different group"
+    ],
+    "id": "fetched_1750944885171",
     "images": [
       {
-        "caption": "Each month, we highlight an app from the Zoom App Marketplace to help you discover new and helpful ways to make your Zoom experience even better.",
+        "caption": "Zoom Virtual Agent manages complex customer inquiries autonomously.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/AOTM+header+image/Zz1kZTdlOWZlY2UzMmQxMWVmYjZlZTc2OTA2NzgyMmE0NQ==?t=20250623024612"
+        "src": "https://media.zoom.com/images/assets/ZVA+UI+in+action.png/Zz01YWVlMTE5ZTQ4OWYxMWYwOTU5NGUyNGVkYTlhYjhmMw=="
+      },
+      {
+        "caption": "Updated CX Analytics dashboard for Zoom Contact Center enhances how teams monitor metrics.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/CX+blog/Zz1kNjU4ZjQ2ODQ1OGMxMWYwYTc1ZjA2ZWQ3MDcxNTUzZQ=="
       }
     ],
-    "include": false,
-    "title": "Bring your files into the flow of your conversation with Microsoft 365 for Zoom"
+    "include": true,
+    "title": "Reimagined Customer Experience with Agentic AI",
+    "url": "https://www.zoom.com/en/blog/agentic-ai-customer-experience/"
   },
   {
-    "id": "https://media.zoom.com/images/assets/ZVA_UI%2Bcustomer.png/Zz01YmQ1ZDQzZTQ4OWYxMWYwYjRhYWYyNGM2NWEyM2EwMg==",
+    "groups": [
+      "Default Group"
+    ],
+    "id": "fetched_1750948664118",
     "images": [
       {
-        "caption": "Discover how AI self-service and agentic AI revolutionize customer experience. Explore solutions like our next-generation Zoom Virtual Agent.",
+        "caption": "Zoom Tasks helps users tackle their to-do lists.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/ZVA_UI%2Bcustomer.png/Zz01YmQ1ZDQzZTQ4OWYxMWYwYjRhYWYyNGM2NWEyM2EwMg=="
-      }
-    ],
-    "include": false,
-    "title": "From frustration to connection: The new era of agentic AI self-service"
-  },
-  {
-    "id": "https://media.zoom.com/images/assets/New+innovations+header.png/Zz02Yjk2MGQyYzQ2NjQxMWYwOThlN2ZlYjQ0ZTY0YjJmMg==?t=20250623024612",
-    "images": [
+        "src": "https://media.zoom.com/images/assets/Zoom+Tasks+News+Blog2.jpg/Zz05Y2VjZDQyMjFhZjAxMWYwOGZkOTE2MmFhODM0NWE1ZA=="
+      },
       {
-        "caption": "Today, Zoom introduced new innovations for Zoom Spaces, including AI-first experiences and collaborations with HP, Google, Cisco, Meta, Logitech, and more.",
+        "caption": "Use Zoom AI Studio to create meeting summary templates with the Custom AI Companion add-on.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/New+innovations+header.png/Zz02Yjk2MGQyYzQ2NjQxMWYwOThlN2ZlYjQ0ZTY0YjJmMg==?t=20250623024612"
-      }
-    ],
-    "include": false,
-    "title": "Zoom debuts innovations for Zoom Spaces to upgrade in-office and hybrid experiences"
-  },
-  {
-    "id": "https://media.zoom.com/images/assets/CX+blog/Zz0wOGM5MWY0YTQ1OGQxMWYwOWM0OThlY2RhNGRhMGY0NA==?t=20250623024612",
-    "images": [
+        "src": "https://media.zoom.com/images/assets/custom+meeting+news+blog.png/Zz1iYWNmODdmODFhY2ExMWYwYmE2YjhlNTEyMDczODgxNg=="
+      },
       {
-        "caption": "Zoom CX solutions deliver smarter self-service and AI-first tools for customers and contact center supervisors.",
+        "caption": "AI playbooks for Zoom Revenue Accelerator streamlines sales processes.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/CX+blog/Zz0wOGM5MWY0YTQ1OGQxMWYwOWM0OThlY2RhNGRhMGY0NA==?t=20250623024612"
-      }
-    ],
-    "include": false,
-    "title": "Zoom reimagines customer experience with agentic AI"
-  },
-  {
-    "id": "https://media.zoom.com/images/assets/clips+ai+avatar+blog+image.jpg/Zz1mZWM1N2YyNmY4NTYxMWVmODFkZjAyOGIyOWFiYmU3Yw==?t=20250623024612",
-    "images": [
+        "src": "https://media.zoom.com/images/assets/ZWP+Dashboard+news+blog.png/Zz1iYWU1YjU0NjFhY2ExMWYwYTk2YjZhYmY5YzNiNzRmNg=="
+      },
       {
-        "caption": "Use AI avatars to generate lifelike videos for marketing, trainings, and more. Create your custom avatar or choose from pre-built avatars and backgrounds.",
+        "caption": "Gather sales insights through deal explorer for Zoom Revenue Accelerator to save time.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/clips+ai+avatar+blog+image.jpg/Zz1mZWM1N2YyNmY4NTYxMWVmODFkZjAyOGIyOWFiYmU3Yw==?t=20250623024612"
+        "src": "https://media.zoom.com/images/assets/Zoom+Phone+News+Blog.png/Zz1lOWEzNWY0YzFiMjMxMWYwYWZmNWJhZDIzZjg1MGQ2Zg=="
       }
     ],
-    "include": false,
-    "title": "How to use AI avatars for Zoom Clips + 6 types of videos to create"
-  },
-  {
-    "id": "https://media.zoom.com/images/assets/Tiles+launch/Zz04ODc3ZTZjYzNiMDYxMWYwYTk0ZjllZDdkY2Y4M2U5Nw==?t=20250623024612",
-    "images": [
-      {
-        "caption": "Tiles for Zoom is a ready-to-use way to beautifully display virtual audiences in a hybrid-first world.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/Tiles+launch/Zz04ODc3ZTZjYzNiMDYxMWYwYTk0ZjllZDdkY2Y4M2U5Nw==?t=20250623024612"
-      }
-    ],
-    "include": false,
-    "title": "Bridge the best of both worlds in your next hybrid event"
-  },
-  {
-    "id": "https://media.zoom.com/images/assets/collaborate-google-docs-microsoft-365-zoom-meetings/Zz0zYjVkZGNiMDRiYmExMWYwOGYyODRhYzM2OTJlYjE3NQ==?t=20250623024613",
-    "images": [
-      {
-        "caption": "Share Microsoft or Google files with your team directly from your Zoom Meeting \u2014 no sending links, no version confusion.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/collaborate-google-docs-microsoft-365-zoom-meetings/Zz0zYjVkZGNiMDRiYmExMWYwOGYyODRhYzM2OTJlYjE3NQ==?t=20250623024613"
-      }
-    ],
-    "include": false,
-    "title": "Collaborate like you\u2019re in the same room, even when you\u2019re not"
+    "include": true,
+    "title": "launches additional agentic skills",
+    "url": "https://www.zoom.com/en/blog/april-2025-innovations/"
   }
 ]

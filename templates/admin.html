@@ -458,10 +458,10 @@
       border: none;
     }
     .story-li {
-      font-size: 1.13em;
+      font-size: 1em;
       margin-bottom: 2px;
       color: #111;
-      font-weight: 500;
+      font-weight: 400;
       background: none;
       border: none;
       padding: 0 0 0 2px;
@@ -572,6 +572,8 @@
       let allStories = [];
       let groupOrders = {};
       let hasUnsavedChanges = false;
+      let reorderMode = false;
+      let reorderTempOrder = [];
 
       // --- DOM ELEMENTS ---
       const groupsList = document.getElementById('groups-list');
@@ -594,6 +596,12 @@
       const toast = document.getElementById('toast');
       const sidebarStoriesList = document.getElementById('sidebar-stories-list');
 
+      // --- Fetch groupOrders from backend on page load ---
+      async function loadGroupOrders() {
+        const res = await fetch('/group_orders');
+        groupOrders = await res.json();
+      }
+
       // --- GROUPS LOGIC ---
       async function loadGroups() {
         const res = await fetch('/groups');
@@ -603,7 +611,7 @@
         if (!groups.includes(slideshowGroup)) slideshowGroup = groups[0] || null;
         if (!groups.includes(activeGroup)) activeGroup = slideshowGroup;
         if (!expandedGroups.size && activeGroup) expandedGroups.add(activeGroup);
-        // Initialize groupOrders if not present
+        // Only initialize groupOrders for new groups
         groups.forEach(g => { if (!groupOrders[g]) groupOrders[g] = []; });
         renderSidebar();
       }
@@ -653,12 +661,15 @@
           if (expandedGroups.has(group)) {
             const ul = document.createElement('ul');
             ul.className = 'group-stories';
+            // Ensure groupOrders[group] contains all stories in the group
+            const allGroupStoryIds = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(group)).map(s => s.id);
+            groupOrders[group] = groupOrders[group] || [];
+            allGroupStoryIds.forEach(id => {
+              if (!groupOrders[group].includes(id)) groupOrders[group].push(id);
+            });
             // Use groupOrders for this group
             let groupStoryIds = groupOrders[group] || [];
             let groupStories = groupStoryIds.map(id => allStories.find(s => s.id === id)).filter(Boolean);
-            // Add any missing stories (e.g., new ones) at the end
-            const extraStories = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(group) && !groupStoryIds.includes(s.id));
-            groupStories = groupStories.concat(extraStories);
             groupStories.forEach(story => {
               const storyLi = document.createElement('li');
               storyLi.textContent = story.title;
@@ -686,7 +697,7 @@
       function selectGroup(group) {
         activeGroup = group;
         activeStory = null;
-        mainTitle.textContent = `Editing Group: ${group}`;
+        mainTitle.textContent = '';
         renderSidebar();
         renderAdminPanel();
       }
@@ -718,7 +729,7 @@
       async function loadAllStories() {
         const res = await fetch('/stories');
         allStories = await res.json();
-        // Initialize groupOrders for all groups
+        // Only initialize groupOrders for new groups
         groups.forEach(g => {
           if (!groupOrders[g]) {
             groupOrders[g] = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(g)).map(s => s.id);
@@ -730,6 +741,7 @@
       function renderAdminPanel() {
         adminStoryList.innerHTML = '';
         if (activeStory) {
+          mainTitle.textContent = `Editing Story: ${activeStory.title}`;
           // Render story card for editing
           const storyElement = document.createElement('div');
           storyElement.className = 'admin-story';
@@ -774,41 +786,235 @@
           adminStoryList.appendChild(storyElement);
           addAdminEventListeners();
         } else if (activeGroup) {
-          // Show all stories in the selected group with drag handles, per-group order
-          let groupStoryIds = groupOrders[activeGroup] || [];
-          let groupStories = groupStoryIds.map(id => allStories.find(s => s.id === id)).filter(Boolean);
-          // Add any missing stories (e.g., new ones) at the end
-          const extraStories = allStories.filter(s => Array.isArray(s.groups) && s.groups.includes(activeGroup) && !groupStoryIds.includes(s.id));
-          groupStories = groupStories.concat(extraStories);
-          if (groupStories.length === 0) {
-            adminStoryList.innerHTML = `<div style="font-size:1.2rem;color:#888;">No stories in this group. Add a new story to this group.</div>`;
+          mainTitle.textContent = '';
+          // --- Group Title Row with Edit/Delete ---
+          const groupTitleRow = document.createElement('div');
+          groupTitleRow.className = 'main-group-title-row';
+          groupTitleRow.style.display = 'flex';
+          groupTitleRow.style.alignItems = 'center';
+          groupTitleRow.style.gap = '12px';
+          groupTitleRow.style.marginBottom = '18px';
+
+          const groupTitle = document.createElement('span');
+          groupTitle.className = 'main-group-title';
+          groupTitle.style.fontSize = '2rem';
+          groupTitle.style.fontWeight = '800';
+          groupTitle.style.color = '#1a237e';
+          groupTitle.textContent = activeGroup;
+
+          // Pencil (edit) icon
+          const editBtn = document.createElement('button');
+          editBtn.className = 'edit-group-btn';
+          editBtn.title = 'Edit group name';
+          editBtn.innerHTML = '✏️';
+          editBtn.style.background = 'none';
+          editBtn.style.border = 'none';
+          editBtn.style.cursor = 'pointer';
+          editBtn.style.fontSize = '1.2rem';
+          editBtn.style.marginLeft = '8px';
+
+          // Red X (delete) icon
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'delete-group-btn';
+          deleteBtn.title = 'Delete group';
+          deleteBtn.innerHTML = '&times;';
+          deleteBtn.style.background = 'none';
+          deleteBtn.style.border = 'none';
+          deleteBtn.style.color = '#e53935';
+          deleteBtn.style.fontSize = '1.5rem';
+          deleteBtn.style.cursor = 'pointer';
+          deleteBtn.style.marginLeft = '8px';
+
+          // Edit group name handler
+          editBtn.onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = activeGroup;
+            input.style.fontSize = '2rem';
+            input.style.fontWeight = '800';
+            input.style.color = '#1a237e';
+            input.style.border = '1.5px solid #1976d2';
+            input.style.borderRadius = '8px';
+            input.style.padding = '4px 12px';
+            input.style.marginLeft = '0';
+            input.style.width = 'min(320px, 40vw)';
+            groupTitleRow.replaceChild(input, groupTitle);
+            input.focus();
+            input.select();
+            // Save on blur or Enter
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter') {
+                input.blur();
+              }
+            });
+            async function saveEdit() {
+              const newName = input.value.trim();
+              if (!newName || newName === activeGroup || groups.includes(newName)) {
+                groupTitleRow.replaceChild(groupTitle, input);
+                return;
+              }
+              // Update group name everywhere
+              const idx = groups.indexOf(activeGroup);
+              if (idx !== -1) groups[idx] = newName;
+              // Update groupOrders
+              if (groupOrders[activeGroup]) {
+                groupOrders[newName] = groupOrders[activeGroup];
+                delete groupOrders[activeGroup];
+              }
+              // Update all stories
+              allStories.forEach(story => {
+                if (Array.isArray(story.groups)) {
+                  story.groups = story.groups.map(g => g === activeGroup ? newName : g);
+                }
+              });
+              activeGroup = newName;
+              // Persist groups and active group to backend
+              await fetch('/groups', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ groups, active: activeGroup })
+              });
+              // Persist stories and groupOrders to backend
+              await fetch('/save_stories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ stories: allStories, groupOrders })
+              });
+              markChanges();
+              renderSidebar();
+              renderAdminPanel();
+            }
+          };
+
+          // Delete group handler
+          deleteBtn.onclick = async () => {
+            if (!confirm(`Delete group "${activeGroup}"? This cannot be undone.`)) return;
+            // Remove from groups
+            groups = groups.filter(g => g !== activeGroup);
+            // Remove from groupOrders
+            delete groupOrders[activeGroup];
+            // Remove from all stories
+            allStories.forEach(story => {
+              if (Array.isArray(story.groups)) {
+                story.groups = story.groups.filter(g => g !== activeGroup);
+              }
+            });
+            activeGroup = groups[0] || null;
+            activeStory = null;
+            // Persist groups and active group to backend
+            await fetch('/groups', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ groups, active: activeGroup })
+            });
+            // Persist stories and groupOrders to backend
+            await fetch('/save_stories', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ stories: allStories, groupOrders })
+            });
+            markChanges();
+            renderSidebar();
+            renderAdminPanel();
+          };
+
+          groupTitleRow.appendChild(groupTitle);
+          groupTitleRow.appendChild(editBtn);
+          groupTitleRow.appendChild(deleteBtn);
+          adminStoryList.appendChild(groupTitleRow);
+
+          // Ensure groupOrders[activeGroup] contains all stories in the group
+          const allGroupStoryIds = allStories
+            .filter(s => Array.isArray(s.groups) && s.groups.includes(activeGroup))
+            .map(s => s.id);
+
+          // Only filter out IDs that are no longer in the group, but preserve the order
+          if (groupOrders[activeGroup]) {
+            groupOrders[activeGroup] = groupOrders[activeGroup].filter(id => allGroupStoryIds.includes(id));
           } else {
+            groupOrders[activeGroup] = [...allGroupStoryIds];
+          }
+
+          // Now, build the groupStories list ONLY from groupOrders[activeGroup], filtering out any stories that no longer exist
+          let groupStoryIds = groupOrders[activeGroup] || [];
+          let groupStories = groupStoryIds
+            .map(id => allStories.find(s => s.id === id))
+            .filter(Boolean); // filter out any nulls
+
+          if (groupStories.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.fontSize = '1.2rem';
+            emptyMsg.style.color = '#888';
+            emptyMsg.textContent = 'No stories in this group. Add a new story to this group.';
+            adminStoryList.appendChild(emptyMsg);
+          } else {
+            // Reorder Mode UI
+            if (!reorderMode) {
+              const reorderBtn = document.createElement('button');
+              reorderBtn.textContent = 'Reorder';
+              reorderBtn.className = 'primary-btn';
+              reorderBtn.style.marginBottom = '18px';
+              reorderBtn.onclick = () => {
+                reorderMode = true;
+                reorderTempOrder = [...groupOrders[activeGroup]];
+                renderAdminPanel();
+              };
+              adminStoryList.appendChild(reorderBtn);
+            }
             const list = document.createElement('ul');
             list.className = 'main-group-story-list';
             groupStories.forEach(story => {
               const li = document.createElement('li');
               li.className = 'main-group-story-li';
-              li.innerHTML = `<span class="drag-handle">⠿</span> <span class="group-story-title">${story.title}</span>`;
               li.setAttribute('data-story-id', story.id);
-              li.onclick = (e) => {
-                // Only select if not clicking the drag handle
-                if (!e.target.classList.contains('drag-handle')) selectStory(story);
-              };
+              li.innerHTML = `${reorderMode ? '<span class="drag-handle">⠿</span>' : ''} <span class="group-story-title">${story.title}</span>`;
+              if (!reorderMode) {
+                li.onclick = (e) => {
+                  selectStory(story);
+                };
+              }
               list.appendChild(li);
             });
             adminStoryList.appendChild(list);
-            // Enable drag-and-drop reordering
-            new Sortable(list, {
-              animation: 150,
-              handle: '.drag-handle',
-              onEnd: function () {
-                const newOrder = Array.from(list.querySelectorAll('.main-group-story-li')).map(el => el.getAttribute('data-story-id'));
-                groupOrders[activeGroup] = newOrder;
+            if (reorderMode) {
+              // Enable drag-and-drop reordering
+              new Sortable(list, {
+                animation: 150,
+                handle: '.drag-handle',
+                onEnd: function () {
+                  const newOrder = Array.from(list.querySelectorAll('.main-group-story-li')).map(el => el.getAttribute('data-story-id'));
+                  console.log('New drag order:', newOrder);
+                  reorderTempOrder = Array.from(new Set(newOrder));
+                }
+              });
+              // Save/Cancel buttons
+              const btnRow = document.createElement('div');
+              btnRow.style.marginTop = '18px';
+              btnRow.style.display = 'flex';
+              btnRow.style.gap = '12px';
+              const saveBtn = document.createElement('button');
+              saveBtn.textContent = 'Save Order';
+              saveBtn.className = 'primary-btn';
+              saveBtn.onclick = () => {
+                console.log('Saving order:', reorderTempOrder);
+                groupOrders[activeGroup] = [...reorderTempOrder];
+                reorderMode = false;
                 markChanges();
                 renderSidebar();
                 renderAdminPanel();
-              }
-            });
+              };
+              const cancelBtn = document.createElement('button');
+              cancelBtn.textContent = 'Cancel';
+              cancelBtn.className = 'secondary-btn';
+              cancelBtn.onclick = () => {
+                reorderMode = false;
+                renderAdminPanel();
+              };
+              btnRow.appendChild(saveBtn);
+              btnRow.appendChild(cancelBtn);
+              adminStoryList.appendChild(btnRow);
+            }
           }
         } else {
           adminStoryList.innerHTML = `<div style="font-size:1.2rem;color:#888;">Select a group or story from the sidebar.</div>`;
@@ -862,7 +1068,6 @@
               groupOrders[group] = groupOrders[group].filter(id => id !== activeStory.id);
             }
             markChanges();
-            renderAdminPanel();
             renderSidebar();
           });
         });
@@ -896,6 +1101,13 @@
             renderAdminPanel();
           }
         });
+        // Add image caption edit event
+        storyElement.querySelectorAll('.img-caption').forEach((el, idx) => {
+          el.addEventListener('input', function() {
+            activeStory.images[idx].caption = this.value;
+            markChanges();
+          });
+        });
       }
       function markChanges() {
         hasUnsavedChanges = true;
@@ -921,14 +1133,19 @@
       });
       function handleAddCustomStory(group) {
         const title = customStoryTitleInput.value.trim() || 'New Custom Story';
+        const groupName = group || activeGroup || groups[0] || null;
         const newStory = {
           id: `custom_${Date.now()}`,
           title,
           link: '',
           include: true,
           images: [],
-          group: group || activeGroup || groups[0] || null
+          groups: groupName ? [groupName] : []
         };
+        if (groupName) {
+          if (!groupOrders[groupName]) groupOrders[groupName] = [];
+          groupOrders[groupName].push(newStory.id);
+        }
         allStories.unshift(newStory);
         activeStory = newStory;
         markChanges();
@@ -964,8 +1181,19 @@
             throw new Error(errorData.error || 'Scraping failed');
           }
           const newStory = await response.json();
-          newStory.group = activeGroup;
-          allStories.unshift(newStory);
+          // Always treat as a new story
+          newStory.id = `fetched_${Date.now()}`;
+          newStory.include = true;
+          newStory.images = newStory.images || [];
+          // Assign to group if one is selected
+          if (activeGroup) {
+            newStory.groups = [activeGroup];
+            if (!groupOrders[activeGroup]) groupOrders[activeGroup] = [];
+            groupOrders[activeGroup].push(newStory.id);
+          } else {
+            newStory.groups = [];
+          }
+          allStories.push(newStory);
           activeStory = newStory;
           markChanges();
           renderSidebar();
@@ -1013,7 +1241,11 @@
         }
       }
       // --- INITIAL LOAD ---
-      loadGroups().then(loadAllStories);
+      (async function() {
+        await loadGroupOrders();
+        await loadGroups();
+        await loadAllStories();
+      })();
       // --- Warn on unsaved changes ---
       window.addEventListener('beforeunload', function (e) {
         if (hasUnsavedChanges) {

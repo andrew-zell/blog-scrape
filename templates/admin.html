@@ -508,6 +508,13 @@
     .sidebar-plus-btn:hover {
       background: #1A237E;
     }
+    .admin-content-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
   </style>
 </head>
 <body>
@@ -729,6 +736,18 @@
       async function loadAllStories() {
         const res = await fetch('/stories');
         allStories = await res.json();
+        // MIGRATION: Convert images to content array if needed
+        allStories.forEach(story => {
+          if (!story.content) {
+            story.content = (story.images || []).map(img => ({
+              type: 'image',
+              src: img.src,
+              caption: img.caption,
+              include: img.include !== false
+            }));
+            delete story.images;
+          }
+        });
         // Only initialize groupOrders for new groups
         groups.forEach(g => {
           if (!groupOrders[g]) {
@@ -751,27 +770,46 @@
             <span class="group-label">${g} <button class="remove-group-btn" data-group="${g}" title="Remove from group">&times;</button></span>
           `).join('')}</div>
           <div class="add-group-dropdown-wrap">${groups.length > (activeStory.groups||[]).length ? `<select class="add-group-dropdown"><option value="">Add to group...</option>${groups.filter(g => !(activeStory.groups||[]).includes(g)).map(g => `<option value="${g}">${g}</option>`).join('')}</select>` : ''}</div></div>`;
-          // Add Image UI
-          let addImageFields = `
+          // Add Content UI (images and text blocks)
+          let contentHTML = `<div class="admin-content-grid">${(activeStory.content || []).map((block, idx) => {
+            if (block.type === 'image') {
+              return `
+                <div class="admin-image-card" data-content-index="${idx}">
+                  <img src="${block.src}" alt="story image" class="story-image-preview">
+                  <div class="image-meta">
+                    <textarea class="img-caption">${block.caption || ''}</textarea>
+                    <div class="image-controls">
+                      <label class="image-visible-label">Visible <input type="checkbox" class="image-visibility-toggle" ${block.include !== false ? 'checked' : ''}></label>
+                      <button class="delete-content-btn" data-content-index="${idx}" title="Delete Image">&times;</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            } else if (block.type === 'text') {
+              return `
+                <div class="admin-image-card admin-text-card" data-content-index="${idx}">
+                  <div class="image-meta">
+                    <textarea class="img-caption text-block">${block.text || ''}</textarea>
+                    <div class="image-controls">
+                      <label class="image-visible-label">Visible <input type="checkbox" class="image-visibility-toggle" ${block.include !== false ? 'checked' : ''}></label>
+                      <button class="delete-content-btn" data-content-index="${idx}" title="Delete Text">&times;</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+            return '';
+          }).join('')}</div>`;
+          // Add buttons to add image or text block
+          let addContentFields = `
             <div class="add-image-fields" style="display:none;">
               <input type="text" class="new-image-url" placeholder="Image URL">
               <input type="text" class="new-image-caption" placeholder="Caption">
               <button class="confirm-add-image-btn">Add</button>
             </div>
             <button class="add-image-btn">Add Image</button>
+            <button class="add-image-btn add-text-btn">Add Text Block</button>
           `;
-          let imagesHTML = `<div class="admin-images-grid">${(activeStory.images || []).map((image, imgIndex) => `
-              <div class="admin-image-card" data-story-index="${imgIndex}">
-                  <img src="${image.src}" alt="story image" class="story-image-preview">
-                  <div class="image-meta">
-                    <textarea class="img-caption">${image.caption}</textarea>
-                    <div class="image-controls">
-                      <label class="image-visible-label">Visible <input type="checkbox" class="image-visibility-toggle" ${image.include !== false ? 'checked' : ''}></label>
-                      <button class="delete-image-btn" data-img-index="${imgIndex}" title="Delete Image">&times;</button>
-                    </div>
-                  </div>
-              </div>
-          `).join('')}</div>`;
           storyElement.innerHTML = `
             <div class="admin-story-content">
                 <div class="admin-story-header-row">
@@ -779,8 +817,8 @@
                   <button class="delete-story-btn" title="Delete Story">Delete</button>
                 </div>
                 ${groupLabels}
-                ${imagesHTML}
-                ${addImageFields}
+                ${contentHTML}
+                ${addContentFields}
             </div>
           `;
           adminStoryList.appendChild(storyElement);
@@ -1031,13 +1069,13 @@
         });
         storyElement.querySelectorAll('.image-visibility-toggle').forEach((el, idx) => {
           el.addEventListener('change', function() {
-            activeStory.images[idx].include = this.checked;
+            activeStory.content[idx].include = this.checked;
             markChanges();
           });
         });
-        storyElement.querySelectorAll('.delete-image-btn').forEach((btn, idx) => {
+        storyElement.querySelectorAll('.delete-content-btn').forEach((btn, idx) => {
           btn.addEventListener('click', function() {
-            activeStory.images.splice(idx, 1);
+            activeStory.content.splice(idx, 1);
             markChanges();
             renderAdminPanel();
           });
@@ -1052,10 +1090,25 @@
           const url = fields.querySelector('.new-image-url').value.trim();
           const caption = fields.querySelector('.new-image-caption').value.trim();
           if (url) {
-            activeStory.images.push({ src: url, caption: caption, include: true });
+            activeStory.content.push({
+              type: 'image',
+              src: url,
+              caption: caption,
+              include: true
+            });
             markChanges();
             renderAdminPanel();
           }
+        });
+        // Add text block event
+        storyElement.querySelector('.add-text-btn').addEventListener('click', function() {
+          activeStory.content.push({
+            type: 'text',
+            text: '',
+            include: true
+          });
+          markChanges();
+          renderAdminPanel();
         });
         // Remove group from story
         storyElement.querySelectorAll('.remove-group-btn').forEach(btn => {
@@ -1101,10 +1154,14 @@
             renderAdminPanel();
           }
         });
-        // Add image caption edit event
+        // Add image caption and text block edit event
         storyElement.querySelectorAll('.img-caption').forEach((el, idx) => {
           el.addEventListener('input', function() {
-            activeStory.images[idx].caption = this.value;
+            if (activeStory.content[idx].type === 'image') {
+              activeStory.content[idx].caption = this.value;
+            } else if (activeStory.content[idx].type === 'text') {
+              activeStory.content[idx].text = this.value;
+            }
             markChanges();
           });
         });
@@ -1139,7 +1196,7 @@
           title,
           link: '',
           include: true,
-          images: [],
+          content: [],
           groups: groupName ? [groupName] : []
         };
         if (groupName) {
@@ -1184,7 +1241,7 @@
           // Always treat as a new story
           newStory.id = `fetched_${Date.now()}`;
           newStory.include = true;
-          newStory.images = newStory.images || [];
+          newStory.content = newStory.content || [];
           // Assign to group if one is selected
           if (activeGroup) {
             newStory.groups = [activeGroup];

@@ -1,154 +1,177 @@
 [
   {
-    "groups": [
-      "Default Group"
-    ],
-    "id": "custom_1750948799966",
-    "images": [
+    "content": [
       {
-        "caption": "maybe the caption",
+        "caption": "You definitely don't want to miss any of these innovations.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/Zoom+innovations+news+blog.png/Zz1iZDgyMGU5NDFhY2ExMWYwYWYzMGJhNDgxYmM5YTAyMQ==?t=20250626013556"
+        "src": "https://media.zoom.com/images/assets/Zoom+innovations+news+blog.png/Zz1iZDgyMGU5NDFhY2ExMWYwYWYzMGJhNDgxYmM5YTAyMQ==?t=20250626013556",
+        "type": "image"
+      },
+      {
+        "include": true,
+        "text": "\nI'm a text box that doesn't show an image. I'm styled differently!\n",
+        "type": "text"
       }
     ],
+    "groups": [
+      "Default Group",
+      "Fifth"
+    ],
+    "id": "custom_1750948799966",
     "include": true,
     "link": "",
     "title": "Custom story"
   },
   {
-    "groups": [
-      "Default Group"
-    ],
-    "id": "custom_1750884517640",
-    "images": [
+    "content": [
       {
         "caption": "bikes",
         "include": true,
-        "src": "https://images.pexels.com/photos/5464925/pexels-photo-5464925.jpeg"
+        "src": "https://images.pexels.com/photos/5464925/pexels-photo-5464925.jpeg",
+        "type": "image"
       },
       {
         "caption": "another photo and a longer caption",
         "include": true,
-        "src": "https://images.pexels.com/photos/289869/pexels-photo-289869.jpeg"
+        "src": "https://images.pexels.com/photos/289869/pexels-photo-289869.jpeg",
+        "type": "image"
       },
       {
         "caption": "third photo",
         "include": true,
-        "src": "https://images.pexels.com/photos/100582/pexels-photo-100582.jpeg"
+        "src": "https://images.pexels.com/photos/100582/pexels-photo-100582.jpeg",
+        "type": "image"
       }
     ],
+    "groups": [
+      "Default Group"
+    ],
+    "id": "custom_1750884517640",
     "include": true,
     "link": "",
     "title": "bicycles"
   },
   {
-    "groups": [
-      "Group No 3"
-    ],
-    "id": "custom_1750884175735",
-    "images": [
+    "content": [
       {
         "caption": "outside",
         "include": true,
-        "src": "https://images.pexels.com/photos/10828941/pexels-photo-10828941.jpeg"
+        "src": "https://images.pexels.com/photos/10828941/pexels-photo-10828941.jpeg",
+        "type": "image"
       },
       {
         "caption": "outside again",
         "include": true,
-        "src": "https://images.pexels.com/photos/10828941/pexels-photo-10828941.jpeg"
+        "src": "https://images.pexels.com/photos/10828941/pexels-photo-10828941.jpeg",
+        "type": "image"
       }
     ],
+    "groups": [
+      "Group No 3"
+    ],
+    "id": "custom_1750884175735",
     "include": true,
     "link": "",
     "title": "testing story"
   },
   {
+    "content": [
+      {
+        "caption": "Creating more immersive experiences with Google Beam.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/TV.jpg/Zz02ODE0NmExODQ2NjQxMWYwODhhNWJhZjUwNTAxNDkxZg==",
+        "type": "image"
+      },
+      {
+        "caption": "Photo check-in streamlines the visitor check-in process.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/welcome.png/Zz02NzAzZTQzMjQ2NjQxMWYwYTlhMmVhNTNlZWQwMWNhNA==",
+        "type": "image"
+      },
+      {
+        "caption": "Workspace Reservation with AI Companion helps employees manage their in-office time effectively.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/workspace.png/Zz02NTAxMjkxMDQ2NjQxMWYwYjY0NjFlZGYzYWZkYjNkZg==",
+        "type": "image"
+      },
+      {
+        "caption": "Smart name tags help make meetings more inclusive.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/Transcript.jpg/Zz02ODJiZGQyZTQ2NjQxMWYwODEyOGJhZjUwNTAxNDkxZg==",
+        "type": "image"
+      },
+      {
+        "caption": "Claim and save makes transferring ownership of meeting assets easier.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/Meeting+title.png/Zz02NTI4MWU4YTQ2NjQxMWYwODEyOGJhZjUwNTAxNDkxZg==",
+        "type": "image"
+      }
+    ],
     "groups": [
       "Default Group",
       "Third Group"
     ],
     "id": "fetched_1750884478864",
-    "images": [
-      {
-        "caption": "Creating more immersive experiences with Google Beam.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/TV.jpg/Zz02ODE0NmExODQ2NjQxMWYwODhhNWJhZjUwNTAxNDkxZg=="
-      },
-      {
-        "caption": "Photo check-in streamlines the visitor check-in process.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/welcome.png/Zz02NzAzZTQzMjQ2NjQxMWYwYTlhMmVhNTNlZWQwMWNhNA=="
-      },
-      {
-        "caption": "Workspace Reservation with AI Companion helps employees manage their in-office time effectively.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/workspace.png/Zz02NTAxMjkxMDQ2NjQxMWYwYjY0NjFlZGYzYWZkYjNkZg=="
-      },
-      {
-        "caption": "Smart name tags help make meetings more inclusive.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/Transcript.jpg/Zz02ODJiZGQyZTQ2NjQxMWYwODEyOGJhZjUwNTAxNDkxZg=="
-      },
-      {
-        "caption": "Claim and save makes transferring ownership of meeting assets easier.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/Meeting+title.png/Zz02NTI4MWU4YTQ2NjQxMWYwODEyOGJhZjUwNTAxNDkxZg=="
-      }
-    ],
     "include": true,
     "title": "New innovations for Zoom Spaces",
     "url": "https://www.zoom.com/en/blog/innovations-for-zoom-spaces/"
   },
   {
+    "content": [
+      {
+        "caption": "Zoom Virtual Agent manages complex customer inquiries autonomously.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/ZVA+UI+in+action.png/Zz01YWVlMTE5ZTQ4OWYxMWYwOTU5NGUyNGVkYTlhYjhmMw==",
+        "type": "image"
+      },
+      {
+        "caption": "Updated CX Analytics dashboard for Zoom Contact Center enhances how teams monitor metrics.",
+        "include": true,
+        "src": "https://media.zoom.com/images/assets/CX+blog/Zz1kNjU4ZjQ2ODQ1OGMxMWYwYTc1ZjA2ZWQ3MDcxNTUzZQ==",
+        "type": "image"
+      }
+    ],
     "groups": [
       "Default Group",
       "Group No 3",
       "I'm a different group"
     ],
     "id": "fetched_1750944885171",
-    "images": [
-      {
-        "caption": "Zoom Virtual Agent manages complex customer inquiries autonomously.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/ZVA+UI+in+action.png/Zz01YWVlMTE5ZTQ4OWYxMWYwOTU5NGUyNGVkYTlhYjhmMw=="
-      },
-      {
-        "caption": "Updated CX Analytics dashboard for Zoom Contact Center enhances how teams monitor metrics.",
-        "include": true,
-        "src": "https://media.zoom.com/images/assets/CX+blog/Zz1kNjU4ZjQ2ODQ1OGMxMWYwYTc1ZjA2ZWQ3MDcxNTUzZQ=="
-      }
-    ],
     "include": true,
     "title": "Reimagined Customer Experience with Agentic AI",
     "url": "https://www.zoom.com/en/blog/agentic-ai-customer-experience/"
   },
   {
-    "groups": [
-      "Default Group"
-    ],
-    "id": "fetched_1750948664118",
-    "images": [
+    "content": [
       {
         "caption": "Zoom Tasks helps users tackle their to-do lists.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/Zoom+Tasks+News+Blog2.jpg/Zz05Y2VjZDQyMjFhZjAxMWYwOGZkOTE2MmFhODM0NWE1ZA=="
+        "src": "https://media.zoom.com/images/assets/Zoom+Tasks+News+Blog2.jpg/Zz05Y2VjZDQyMjFhZjAxMWYwOGZkOTE2MmFhODM0NWE1ZA==",
+        "type": "image"
       },
       {
         "caption": "Use Zoom AI Studio to create meeting summary templates with the Custom AI Companion add-on.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/custom+meeting+news+blog.png/Zz1iYWNmODdmODFhY2ExMWYwYmE2YjhlNTEyMDczODgxNg=="
+        "src": "https://media.zoom.com/images/assets/custom+meeting+news+blog.png/Zz1iYWNmODdmODFhY2ExMWYwYmE2YjhlNTEyMDczODgxNg==",
+        "type": "image"
       },
       {
         "caption": "AI playbooks for Zoom Revenue Accelerator streamlines sales processes.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/ZWP+Dashboard+news+blog.png/Zz1iYWU1YjU0NjFhY2ExMWYwYTk2YjZhYmY5YzNiNzRmNg=="
+        "src": "https://media.zoom.com/images/assets/ZWP+Dashboard+news+blog.png/Zz1iYWU1YjU0NjFhY2ExMWYwYTk2YjZhYmY5YzNiNzRmNg==",
+        "type": "image"
       },
       {
         "caption": "Gather sales insights through deal explorer for Zoom Revenue Accelerator to save time.",
         "include": true,
-        "src": "https://media.zoom.com/images/assets/Zoom+Phone+News+Blog.png/Zz1lOWEzNWY0YzFiMjMxMWYwYWZmNWJhZDIzZjg1MGQ2Zg=="
+        "src": "https://media.zoom.com/images/assets/Zoom+Phone+News+Blog.png/Zz1lOWEzNWY0YzFiMjMxMWYwYWZmNWJhZDIzZjg1MGQ2Zg==",
+        "type": "image"
       }
     ],
+    "groups": [
+      "Default Group"
+    ],
+    "id": "fetched_1750948664118",
     "include": true,
     "title": "launches additional agentic skills",
     "url": "https://www.zoom.com/en/blog/april-2025-innovations/"

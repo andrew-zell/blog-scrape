@@ -78,14 +78,17 @@
     .card {
       background: #fff;
       border-radius: 24px;
-      padding: 36px 36px 24px 36px;
+      padding: 18px 18px 12px 18px;
       max-width: 400px;
-      width: 100%;
+      width: 400px;
+      min-width: 0;
+      flex: 0 1 400px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
       box-shadow: 0 2px 12px rgba(11,95,255,0.08);
+      margin-bottom: 4px;
     }
     .card img {
       width: 100%;
@@ -120,6 +123,17 @@
       .card { padding: 18px 8px 12px 8px; }
       .card-grid { gap: 16px; }
     }
+    .text-card {
+      background: rgba(255,255,255,0.15) !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 150px;
+    }
+    .text-card p {
+      color: #fff !important;
+    }
   </style>
 </head>
 <body>
@@ -151,8 +165,15 @@
         return;
       }
       visibleStories.forEach(story => {
-        const visibleImages = (story.images || []).filter(img => img.include !== false);
-        if (visibleImages.length > 0) {
+        // Use story.content if available, fallback to images for legacy
+        const contentBlocks = (story.content || (story.images || []).map(img => ({
+          type: 'image',
+          src: img.src,
+          caption: img.caption,
+          include: img.include !== false
+        })));
+        const visibleBlocks = contentBlocks.filter(block => block.include !== false);
+        if (visibleBlocks.length > 0) {
           const slide = document.createElement('div');
           slide.className = 'slide';
           const title = document.createElement('div');
@@ -161,15 +182,24 @@
           slide.appendChild(title);
           const cardGrid = document.createElement('div');
           cardGrid.className = 'card-grid';
-          visibleImages.forEach(image => {
+          visibleBlocks.forEach(block => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `
-              <img src="${image.src}" alt="${image.caption}">
-              <p>${image.caption}</p>
-            `;
+            if (block.type === 'image') {
+              card.innerHTML = `
+                <img src="${block.src}" alt="${block.caption}">
+                <p>${block.caption}</p>
+              `;
+            } else if (block.type === 'text') {
+              card.classList.add('text-card');
+              card.innerHTML = `
+                <p style="font-size:1.2rem;font-weight:700;text-align:center;font-family:'Montserrat',sans-serif;margin:0;">${block.text || ''}</p>
+              `;
+            }
+            console.log('Appending card:', block, card);
             cardGrid.appendChild(card);
           });
+          console.log('cardGrid children:', cardGrid.children);
           slide.appendChild(cardGrid);
           container.appendChild(slide);
         }
@@ -181,11 +211,24 @@
       const slides = document.querySelectorAll('.slide');
       if (slides.length === 0) return;
       slides[0].classList.add('active');
-      setInterval(() => {
+
+      let interval = setInterval(nextSlide, 12000);
+
+      function nextSlide() {
         slides[index].classList.remove('active');
         index = (index + 1) % slides.length;
         slides[index].classList.add('active');
-      }, 12000);
+      }
+
+      // Add click-to-advance and reset timer
+      const slideshowSection = document.querySelector('.slideshow-section');
+      if (slideshowSection) {
+        slideshowSection.onclick = () => {
+          clearInterval(interval);
+          nextSlide();
+          interval = setInterval(nextSlide, 12000);
+        };
+      }
     }
     document.addEventListener('DOMContentLoaded', loadStories);
   </script>

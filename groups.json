@@ -1,12 +1,12 @@
 {
   "groups": [
     "Default Group",
-    "I'm a different group",
+    "Healthcare",
     "Group No 3",
     "Fourth",
     "Fifth",
     "test",
     "another group"
   ],
-  "active": "Default Group"
+  "active": "Healthcare"
 }

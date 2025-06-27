@@ -1,5 +1,21 @@
 [
   {
+    "id": "custom_1751042585666",
+    "title": "healthcare 1",
+    "link": "",
+    "include": true,
+    "content": [
+      {
+        "type": "text",
+        "text": "here's just a textblock",
+        "include": true
+      }
+    ],
+    "groups": [
+      "Healthcare"
+    ]
+  },
+  {
     "content": [
       {
         "caption": "You definitely don't want to miss any of these innovations.",
@@ -134,7 +150,7 @@
     "groups": [
       "Default Group",
       "Group No 3",
-      "I'm a different group"
+      "Healthcare"
     ],
     "id": "fetched_1750944885171",
     "include": true,

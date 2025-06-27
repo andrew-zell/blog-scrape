@@ -15,7 +15,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 app = Flask(__name__)
 # Use environment variables for secrets; set these in your environment for production!
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'changeme-please')
-app.config['SESSION_COOKIE_SECURE'] = True
+
+if os.environ.get('RENDER') == 'true':
+    app.config['SESSION_COOKIE_SECURE'] = True
+else:
+    app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'changeme123')
 DATA_FILE = 'data.json'
@@ -29,7 +33,7 @@ ADMIN_PASSWORD_HASH = generate_password_hash('zmslides', method='pbkdf2:sha256')
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('admin') or not session.get('username'):
+        if not session.get('logged_in'):
             return jsonify({'error': 'Unauthorized'}), 401
         return f(*args, **kwargs)
     return decorated_function
@@ -414,6 +418,11 @@ def get_group_orders():
 def logout():
     session.clear()
     return redirect(url_for('admin'))
+
+@app.route('/test_auth')
+def test_auth():
+    from flask import jsonify, session
+    return jsonify({'logged_in': session.get('logged_in', False)})
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True) 

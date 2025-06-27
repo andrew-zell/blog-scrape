@@ -1262,6 +1262,15 @@
             throw new Error(errorData.error || 'Scraping failed');
           }
           const newStory = await response.json();
+          // Convert images to content if needed
+          if (newStory.images && !newStory.content) {
+            newStory.content = newStory.images.map(img => ({
+              type: 'image',
+              src: img.src,
+              caption: img.caption,
+              include: img.include !== false
+            }));
+          }
           // Always treat as a new story
           newStory.id = `fetched_${Date.now()}`;
           newStory.include = true;

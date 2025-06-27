@@ -284,7 +284,7 @@ def scrape_story():
     if not story_url:
         return jsonify({'error': 'No URL provided'}), 400
     try:
-        res = requests.get(story_url)
+        res = requests.get(story_url, headers={'User-Agent': 'Mozilla/5.0'})
         soup = BeautifulSoup(res.text, 'html.parser')
         images = []
         for img in soup.find_all("img"):

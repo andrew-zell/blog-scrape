@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_file, render_template, session
+from flask import Flask, jsonify, request, send_file, render_template, session, redirect, url_for
 import requests
 import os
 import json
@@ -20,6 +20,8 @@ DATA_FILE = 'data.json'
 RSS_SOURCE = 'zoom_blog_feed_v3.xml'  # Or a URL if you want live fetching
 USERS_FILE = 'users.json'
 GROUPS_FILE = 'groups.json'
+
+ADMIN_PASSWORD_HASH = generate_password_hash('zmslides', method='pbkdf2:sha256')
 
 # --- Admin session decorator ---
 def admin_required(f):
@@ -299,8 +301,18 @@ def scrape_story():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
+    error = None
+    if not session.get('logged_in'):
+        if request.method == 'POST':
+            password = request.form['password']
+            if check_password_hash(ADMIN_PASSWORD_HASH, password):
+                session['logged_in'] = True
+            else:
+                error = 'Invalid password'
+        if not session.get('logged_in'):
+            return render_template('login.html', error=error)
     return render_template('admin.html')
 
 def load_groups():
@@ -395,6 +407,11 @@ def get_group_orders():
         with open('group_orders.json', 'r', encoding='utf-8') as f:
             return jsonify(json.load(f))
     return jsonify({})
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True) 

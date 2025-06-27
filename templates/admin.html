@@ -515,6 +515,28 @@
       justify-content: flex-start;
       align-items: flex-start;
     }
+    .logout-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 9999;
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 32px;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      box-shadow: 0 2px 12px rgba(11,95,255,0.10);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .logout-btn:hover {
+      background: #e53935;
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(229,57,53,0.15);
+    }
   </style>
 </head>
 <body>
@@ -568,6 +590,7 @@
     </div>
   </div>
   <div id="toast" style="display:none;position:fixed;top:24px;right:24px;z-index:9999;padding:16px 32px;background:#6c63ff;color:#fff;border-radius:8px;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-family:'Montserrat',sans-serif;">Saved!</div>
+  <a href="/logout" class="logout-btn" title="Log out">Log out</a>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // --- STATE ---

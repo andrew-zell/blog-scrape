@@ -15,6 +15,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 app = Flask(__name__)
 # Use environment variables for secrets; set these in your environment for production!
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'changeme-please')
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'changeme123')
 DATA_FILE = 'data.json'
 RSS_SOURCE = 'zoom_blog_feed_v3.xml'  # Or a URL if you want live fetching

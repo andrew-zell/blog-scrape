@@ -26,6 +26,7 @@ DATA_FILE = 'data.json'
 RSS_SOURCE = 'zoom_blog_feed_v3.xml'  # Or a URL if you want live fetching
 USERS_FILE = 'users.json'
 GROUPS_FILE = 'groups.json'
+DISPLAY_CONFIG_FILE = 'display_config.json'
 
 ADMIN_PASSWORD_HASH = generate_password_hash('zmslides', method='pbkdf2:sha256')
 
@@ -371,6 +372,10 @@ def active_group():
 def get_stories():
     data = ensure_story_groups(load_data())
     group = request.args.get('group')
+    screen = request.args.get('screen')
+    if screen:
+        display_config = load_display_config()
+        group = display_config.get(screen)
     if group:
         # Load groupOrders from disk
         group_orders = {}
@@ -423,6 +428,27 @@ def logout():
 def test_auth():
     from flask import jsonify, session
     return jsonify({'logged_in': session.get('logged_in', False)})
+
+def load_display_config():
+    if not os.path.exists(DISPLAY_CONFIG_FILE):
+        return {}
+    with open(DISPLAY_CONFIG_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_display_config(config):
+    with open(DISPLAY_CONFIG_FILE, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2)
+
+@app.route('/display_config', methods=['GET', 'POST'])
+def display_config():
+    if request.method == 'POST':
+        config = request.get_json()
+        if not isinstance(config, dict):
+            return jsonify({'success': False, 'error': 'Invalid config'}), 400
+        save_display_config(config)
+        return jsonify({'success': True})
+    else:
+        return jsonify(load_display_config())
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True) 

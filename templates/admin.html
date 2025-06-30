@@ -537,12 +537,17 @@
       color: #fff;
       box-shadow: 0 4px 24px rgba(229,57,53,0.15);
     }
+    .group-li.active-for-display { background: #19c37d; color: #fff !important; font-weight: 700; }
   </style>
 </head>
 <body>
   <div class="admin-container">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-section">
+        <div style="margin-bottom: 18px;">
+          <label for="display-selector" style="font-weight:600;font-size:1.1em;">Display:</label>
+          <select id="display-selector" style="margin-left:8px;padding:6px 12px;border-radius:8px;border:1.5px solid #d1d5db;font-size:1em;"></select>
+        </div>
         <div class="sidebar-heading-row">
           <h2 class="sidebar-heading">Groups</h2>
           <button id="add-group-btn" class="sidebar-plus-btn" title="Add Group">+</button>
@@ -598,6 +603,9 @@
       let expandedGroups = new Set();
       let activeGroup = null;
       let activeStory = null;
+      let displayConfig = {};
+      let displays = [];
+      let selectedDisplay = null;
       let slideshowGroup = null;
       let allStories = [];
       let groupOrders = {};
@@ -626,6 +634,9 @@
       const toast = document.getElementById('toast');
       const sidebarStoriesList = document.getElementById('sidebar-stories-list');
 
+      // --- Display Config UI ---
+      const displaySelector = document.getElementById('display-selector');
+
       // --- Fetch groupOrders from backend on page load ---
       async function loadGroupOrders() {
         const res = await fetch('/group_orders');
@@ -636,7 +647,7 @@
       async function loadGroups() {
         const res = await fetch('/groups');
         const data = await res.json();
-        groups = data.groups;
+        groups = data.groups || [];
         slideshowGroup = data.active;
         if (!groups.includes(slideshowGroup)) slideshowGroup = groups[0] || null;
         if (!groups.includes(activeGroup)) activeGroup = slideshowGroup;
@@ -670,7 +681,7 @@
           groupName.style.cursor = 'pointer';
           li.appendChild(groupName);
           // Active badge
-          if (group === slideshowGroup) {
+          if (selectedDisplay && displayConfig[selectedDisplay] === group) {
             const badge = document.createElement('span');
             badge.className = 'group-active-badge';
             badge.textContent = 'ACTIVE';
@@ -722,6 +733,14 @@
           }
           li.onclick = () => selectStory(story);
           sidebarStoriesList.appendChild(li);
+        });
+        // After rendering group list, highlight the group assigned to selectedDisplay
+        const groupLis = document.querySelectorAll('.group-li');
+        groupLis.forEach(li => {
+          li.classList.remove('active-for-display');
+          if (selectedDisplay && displayConfig[selectedDisplay] === li.dataset.group) {
+            li.classList.add('active-for-display');
+          }
         });
       }
       function selectGroup(group) {
@@ -1298,19 +1317,17 @@
           submitStoryUrlBtn.disabled = false;
         }
       }
-      // --- Set Active Group ---
+      // --- Set Active Group for Display ---
       setActiveBtn.addEventListener('click', async () => {
-        if (!activeGroup) return;
-        const res = await fetch('/active_group', {
+        if (!selectedDisplay || !activeGroup) return;
+        displayConfig[selectedDisplay] = activeGroup;
+        await fetch('/display_config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ active: activeGroup })
+          body: JSON.stringify(displayConfig)
         });
-        if (res.ok) {
-          slideshowGroup = activeGroup;
-          renderSidebar();
-          showToast('Active group set!');
-        }
+        showToast('Active group set for display!');
+        renderSidebar();
       });
       // --- Save All Stories ---
       saveAllBtn.addEventListener('click', saveAllStories);
@@ -1330,9 +1347,35 @@
           alert('Could not save changes. Please check the console for errors.');
         }
       }
+      // --- Display Config Logic ---
+      async function loadDisplayConfig() {
+        const res = await fetch('/display_config');
+        displayConfig = await res.json();
+        displays = Object.keys(displayConfig);
+        renderDisplaySelector();
+      }
+      function renderDisplaySelector() {
+        displaySelector.innerHTML = '';
+        displays.forEach(display => {
+          const opt = document.createElement('option');
+          opt.value = display;
+          opt.textContent = display;
+          displaySelector.appendChild(opt);
+        });
+        if (!selectedDisplay && displays.length > 0) {
+          selectedDisplay = displays[0];
+        }
+        displaySelector.value = selectedDisplay;
+        // When display changes, update group highlighting
+        renderSidebar();
+      }
+      displaySelector.addEventListener('change', () => {
+        selectedDisplay = displaySelector.value;
+        renderSidebar();
+      });
       // --- INITIAL LOAD ---
       (async function() {
-        await loadGroupOrders();
+        await loadDisplayConfig();
         await loadGroups();
         await loadAllStories();
       })();

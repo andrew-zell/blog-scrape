@@ -147,12 +147,23 @@
   </div>
   <script>
     async function loadStories() {
-      // Fetch the active group first
-      const groupRes = await fetch('/active_group');
-      const groupData = await groupRes.json();
-      const activeGroup = groupData.active;
-      // Now fetch stories for that group
-      const res = await fetch('/stories?group=' + encodeURIComponent(activeGroup));
+      // Get the screen parameter from the URL
+      function getScreenFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('screen');
+      }
+      const screen = getScreenFromURL();
+      let url = '/stories';
+      if (screen) {
+        url += '?screen=' + encodeURIComponent(screen);
+      } else {
+        // Fallback to active group if no screen param
+        const groupRes = await fetch('/active_group');
+        const groupData = await groupRes.json();
+        const activeGroup = groupData.active;
+        url += '?group=' + encodeURIComponent(activeGroup);
+      }
+      const res = await fetch(url);
       const stories = await res.json();
       renderSlideshow(stories);
     }

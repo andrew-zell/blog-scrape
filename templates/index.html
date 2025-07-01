@@ -41,20 +41,28 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
+      position: relative;
+    }
+    #slideshow {
+      position: relative;
+      width: 100%;
+      height: 100%;
     }
     .slide {
-      display: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 100%;
-      margin: 0;
+      position: absolute;
+      left: 0; top: 0; width: 100%; height: 100%;
       color: white;
-      transition: opacity 0.5s;
     }
     .slide.active {
-      display: flex;
       opacity: 1;
+      pointer-events: auto;
     }
     .slide-title {
       font-size: 2.2rem;
@@ -221,6 +229,7 @@
       let index = 0;
       const slides = document.querySelectorAll('.slide');
       if (slides.length === 0) return;
+      slides.forEach(slide => slide.classList.remove('active'));
       slides[0].classList.add('active');
 
       let interval = setInterval(nextSlide, 12000);

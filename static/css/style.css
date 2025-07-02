@@ -45,8 +45,8 @@ body {
 
 /* Slideshow Styles */
 .slide {
-    width: 90%;
-    max-width: 1400px;
+    width: 98vw;
+    max-width: none;
     display: flex;
     flex-direction: column;
     justify-content: center;

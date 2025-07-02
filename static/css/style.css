@@ -81,8 +81,8 @@ body {
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 32px;
-    width: 100%;
+    gap: 40px;
+    width: 90%;
     justify-items: center;
     align-items: stretch;
     text-align: center;

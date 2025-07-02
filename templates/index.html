@@ -175,6 +175,19 @@
       const stories = await res.json();
       renderSlideshow(stories);
     }
+    function equalizeCardHeights() {
+      const activeSlide = document.querySelector('.slide.active');
+      if (!activeSlide) return;
+      const cards = activeSlide.querySelectorAll('.card');
+      let maxHeight = 0;
+      cards.forEach(card => {
+        card.style.height = 'auto'; // Reset first
+        maxHeight = Math.max(maxHeight, card.offsetHeight);
+      });
+      cards.forEach(card => {
+        card.style.height = maxHeight + 'px';
+      });
+    }
     function renderSlideshow(stories) {
       const container = document.getElementById('slideshow');
       container.innerHTML = '';
@@ -224,6 +237,7 @@
         }
       });
       startSlideshow();
+      equalizeCardHeights();
     }
     function startSlideshow() {
       let index = 0;
@@ -231,6 +245,7 @@
       if (slides.length === 0) return;
       slides.forEach(slide => slide.classList.remove('active'));
       slides[0].classList.add('active');
+      equalizeCardHeights();
 
       let interval = setInterval(nextSlide, 12000);
 
@@ -238,6 +253,7 @@
         slides[index].classList.remove('active');
         index = (index + 1) % slides.length;
         slides[index].classList.add('active');
+        equalizeCardHeights();
       }
 
       // Add click-to-advance and reset timer
@@ -249,6 +265,8 @@
           interval = setInterval(nextSlide, 12000);
         };
       }
+      // Re-equalize on window resize
+      window.addEventListener('resize', equalizeCardHeights);
     }
     document.addEventListener('DOMContentLoaded', loadStories);
   </script>

@@ -57,7 +57,7 @@
       align-items: center;
       justify-content: center;
       position: absolute;
-      left: 0; top: 0; /* width: 100%; max-width: 1400px; */ height: 100%;
+      left: 0; top: 0; width: 100%; height: 100%;
       color: white;
     }
     .slide.active {
@@ -65,7 +65,7 @@
       pointer-events: auto;
     }
     .slide-title {
-      /* font-size: 2.2rem; */
+      font-size: 2.2rem;
       font-weight: 700;
       color: #fff;
       margin-bottom: 36px;
@@ -74,7 +74,7 @@
       letter-spacing: -0.5px;
       width: 100%;
     }
-    /* .card-grid {
+    .card-grid {
       display: flex;
       flex-wrap: wrap;
       gap: 40px;
@@ -82,15 +82,15 @@
       justify-content: center;
       align-items: flex-start;
       text-align: center;
-    } */
+    }
     .card {
       background: #fff;
       border-radius: 24px;
       padding: 18px 18px 12px 18px;
-      /* max-width: 400px; */
-      /* width: 400px; */
-      /* min-width: 0; */
-      /* flex: 0 1 400px; */
+      max-width: 400px;
+      width: 400px;
+      min-width: 0;
+      flex: 0 1 400px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -108,7 +108,7 @@
       margin-bottom: 12px;
     }
     .card p {
-      /* font-size: 1.2rem; */
+      font-size: 1.2rem;
       margin: 0;
       margin-top: 4px;
       color: #000;
@@ -129,7 +129,7 @@
     @media (max-width: 700px) {
       .slide-title { font-size: 1.3rem; }
       .card { padding: 18px 8px 12px 8px; }
-      /* .card-grid { gap: 16px; } */
+      .card-grid { gap: 16px; }
     }
     .text-card {
       background: rgba(255,255,255,0.15) !important;
@@ -224,9 +224,9 @@
               `;
             } else if (block.type === 'text') {
               card.classList.add('text-card');
-              card.innerHTML = `
+            card.innerHTML = `
                 <p style="font-size:1.2rem;font-weight:700;text-align:center;font-family:'Montserrat',sans-serif;margin:0;">${block.text || ''}</p>
-              `;
+            `;
             }
             console.log('Appending card:', block, card);
             cardGrid.appendChild(card);

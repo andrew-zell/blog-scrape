@@ -66,49 +66,57 @@ body {
 }
 
 .slide-title {
-    font-size: 2.2rem;
-    font-weight: 700;
+    font-size: 3vw;
+    font-weight: 800;
     color: #fff;
-    margin-bottom: 36px;
+    margin-bottom: 2vw;
+    margin-top: 0;
     text-align: center;
     letter-spacing: -0.5px;
+    width: 100%;
 }
 
 .card-grid {
-    display: flex;
-    gap: 40px;
+    gap: 3vw;
+    width: 100%;
     justify-content: center;
     align-items: flex-start;
-    flex-wrap: wrap;
+    text-align: center;
 }
 
 .card {
     background: #fff;
     border-radius: 24px;
-    padding: 24px;
-    width: 380px;
-    box-sizing: border-box;
+    padding: 2vw 2vw 1vw 2vw;
+    width: 28vw;
+    max-width: 40vw;
+    min-width: 320px;
+    max-height: 60vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 2px 12px rgba(11, 95, 255, 0.08);
+    box-shadow: 0 2px 12px rgba(11,95,255,0.08);
 }
 
 .card img {
     width: 100%;
     height: auto;
+    max-height: 32vh;
     border-radius: 12px;
+    background: #e0e0e0;
     aspect-ratio: 16/9;
     object-fit: cover;
-    margin-bottom: 12px;
+    margin-bottom: 2vw;
 }
 
 .card p {
-    font-size: 1.1rem;
-    margin: 4px 0 0 0;
+    font-size: 2vw;
+    margin: 0;
+    margin-top: 1vw;
     color: #000;
-    font-weight: 600;
+    font-weight: 700;
     text-align: center;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* Admin Gear Icon */

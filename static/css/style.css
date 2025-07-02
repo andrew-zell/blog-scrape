@@ -41,6 +41,8 @@ body {
     background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
     overflow: hidden;
     position: relative;
+    width: 100vw;
+    max-width: none;
 }
 
 /* Slideshow Styles */
@@ -947,4 +949,9 @@ body {
 
 .group-story-title {
   vertical-align: middle;
+}
+
+#slideshow {
+  width: 100vw;
+  max-width: none;
 } 

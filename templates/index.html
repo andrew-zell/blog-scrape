@@ -5,7 +5,6 @@
   <title>Zoom Blog Curation</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Remove conflicting layout and card styles to defer to external CSS */
     body {
       margin: 0;
       padding: 0;
@@ -35,14 +34,102 @@
       letter-spacing: -1px;
       user-select: none;
     }
-    /* All layout, card, grid, and slide styles are now handled by static/css/style.css */
+    .slideshow-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
+      position: relative;
+    }
+    #slideshow {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .slide {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 0; top: 0; /* width: 100%; max-width: 1400px; */ height: 100%;
+      color: white;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .slide-title {
+      /* font-size: 2.2rem; */
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 36px;
+      margin-top: 0;
+      text-align: center;
+      letter-spacing: -0.5px;
+      width: 100%;
+    }
+    /* .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      width: 100%;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: center;
+    } */
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 18px 18px 12px 18px;
+      /* max-width: 400px; */
+      /* width: 400px; */
+      /* min-width: 0; */
+      /* flex: 0 1 400px; */
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(11,95,255,0.08);
+      margin-bottom: 4px;
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: #e0e0e0;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+    .card p {
+      /* font-size: 1.2rem; */
+      margin: 0;
+      margin-top: 4px;
+      color: #000;
+      font-weight: 700;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+    }
     @media (max-width: 900px) {
       .main-container { flex-direction: column; }
       .whats-new-section { width: 100vw; min-width: 0; max-width: none; height: 120px; }
       .slideshow-section { height: calc(100vh - 120px); }
+      .slide {
+        width: 98vw;
+        max-width: 98vw;
+        margin: 0 auto;
+      }
     }
     @media (max-width: 700px) {
-      .whats-new-text { font-size: 2rem; }
+      .slide-title { font-size: 1.3rem; }
+      .card { padding: 18px 8px 12px 8px; }
+      /* .card-grid { gap: 16px; } */
     }
     .text-card {
       background: rgba(255,255,255,0.15) !important;

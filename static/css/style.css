@@ -41,14 +41,14 @@ body {
     background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
     overflow: hidden;
     position: relative;
-    width: 100vw;
-    max-width: none;
+    width: 100vw !important;
+    max-width: none !important;
 }
 
 /* Slideshow Styles */
 .slide {
-    width: 98vw;
-    max-width: none;
+    width: 98vw !important;
+    max-width: none !important;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -952,6 +952,6 @@ body {
 }
 
 #slideshow {
-  width: 100vw;
-  max-width: none;
+  width: 100vw !important;
+  max-width: none !important;
 } 

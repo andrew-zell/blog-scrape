@@ -41,14 +41,12 @@ body {
     background: linear-gradient(90deg, #0B5FFF 0%, #00053D 100%);
     overflow: hidden;
     position: relative;
-    width: 100vw !important;
-    max-width: none !important;
 }
 
 /* Slideshow Styles */
 .slide {
-    width: 98vw !important;
-    max-width: none !important;
+    width: 90%;
+    max-width: 1400px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -68,59 +66,51 @@ body {
 }
 
 .slide-title {
-    font-size: clamp(2rem, 2.8vw, 3.2rem);
-    font-weight: 800;
+    font-size: 2.2rem;
+    font-weight: 700;
     color: #fff;
-    margin-bottom: 32px;
-    margin-top: 0;
+    margin-bottom: 36px;
     text-align: center;
     letter-spacing: -0.5px;
-    width: 100%;
 }
 
 .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 40px;
-    width: 90%;
-    justify-items: center;
-    align-items: stretch;
-    text-align: center;
+    display: flex;
+    gap: clamp(40px, 6vw, 80px);
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .card {
     background: #fff;
     border-radius: 24px;
-    padding: 24px 18px 18px 18px;
+    padding: 24px;
     width: 100%;
-    max-width: 1000px;
-    min-width: 0;
+    max-width: 600px;
+    min-width: 320px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 2px 12px rgba(11,95,255,0.08);
-    margin-bottom: 4px;
+    box-shadow: 0 2px 12px rgba(11, 95, 255, 0.08);
 }
 
 .card img {
     width: 100%;
+    height: auto;
+    border-radius: 12px;
     aspect-ratio: 16/9;
     object-fit: cover;
-    border-radius: 12px;
-    background: #e0e0e0;
-    margin-bottom: 16px;
-    max-height: 520px;
+    margin-bottom: 12px;
 }
 
 .card p {
-    font-size: clamp(1.1rem, 1.7vw, 2rem);
-    margin: 0;
-    margin-top: 8px;
+    font-size: 1.1rem;
+    margin: 4px 0 0 0;
     color: #000;
     font-weight: 600;
     text-align: center;
-    font-family: 'Montserrat', sans-serif;
 }
 
 /* Admin Gear Icon */
@@ -951,9 +941,4 @@ body {
 
 .group-story-title {
   vertical-align: middle;
-}
-
-#slideshow {
-  width: 100vw !important;
-  max-width: none !important;
 } 

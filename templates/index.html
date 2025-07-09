@@ -131,6 +131,12 @@
       .card { padding: 18px 8px 12px 8px; }
       .card-grid { gap: 16px; }
     }
+    @media (min-aspect-ratio: 15/9) and (max-aspect-ratio: 17/9) {
+    .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: auto;
+    justify-items: center;
+  }
     .text-card {
       background: rgba(255,255,255,0.15) !important;
       display: flex;

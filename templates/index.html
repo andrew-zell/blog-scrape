@@ -145,45 +145,14 @@
       .card-grid { gap: 16px; }
     }
     @media (min-aspect-ratio: 15/9) and (max-aspect-ratio: 17/9) {
-  .slideshow-section {
-    height: 85vh !important;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    overflow: hidden;
+    .card-grid {
+      max-height: 70%;
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: auto;
+      justify-items: center;
+    }
+    
   }
-
-  #slideshow {
-    height: 100% !important;
-    overflow: hidden;
-  }
-
-  .slide {
-    position: relative !important;
-    height: 100% !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow: hidden;
-  }
-
-  .slide-title {
-    flex-shrink: 0;
-    font-size: 3rem;
-    margin-bottom: 24px;
-  }
-
-  .card-grid {
-    flex: 1;
-    max-height: 100%;
-    transform: scale(0.9);
-    transform-origin: top center;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: clamp(16px, 4vw, 48px);
-  }
-}
   </style>
 </head>
 <body>

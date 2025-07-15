@@ -146,15 +146,18 @@
     }
     @media (min-aspect-ratio: 15/9) and (max-aspect-ratio: 17/9) {
     .card-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: auto;
-    justify-items: center;
+      flex: 1;
+      max-height: 100%;
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: auto;
+      justify-items: center;
+      transform: scale(0.9);
+      transform-origin: bottom center;
     }
     .slideshow-section {
-    height: 85vh; /* or 80vh depending on your content */
+      height: 85vh; /* or 80vh depending on your content */
+    }
   }
-  }
-  
   </style>
 </head>
 <body>

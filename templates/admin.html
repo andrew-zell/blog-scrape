@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Zoom Blog Admin</title>
+  <title>Story Builder - Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -596,6 +596,7 @@
   </div>
   <div id="toast" style="display:none;position:fixed;top:24px;right:24px;z-index:9999;padding:16px 32px;background:#6c63ff;color:#fff;border-radius:8px;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.12);font-family:'Montserrat',sans-serif;">Saved!</div>
   <a href="/logout" class="logout-btn" title="Log out">Log out</a>
+   <a href="/documentation" class="logout-btn" title="Documentation" style="right: 180px;">Documentation</a>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // --- STATE ---
